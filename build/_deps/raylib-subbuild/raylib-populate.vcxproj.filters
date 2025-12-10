@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeFiles\c7c425f30d052c8f7d607dec3bf7be5f\raylib-populate-mkdir.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeFiles\c7c425f30d052c8f7d607dec3bf7be5f\raylib-populate-download.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeFiles\c7c425f30d052c8f7d607dec3bf7be5f\raylib-populate-update.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeFiles\c7c425f30d052c8f7d607dec3bf7be5f\raylib-populate-patch.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeFiles\c7c425f30d052c8f7d607dec3bf7be5f\raylib-populate-configure.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeFiles\c7c425f30d052c8f7d607dec3bf7be5f\raylib-populate-build.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeFiles\c7c425f30d052c8f7d607dec3bf7be5f\raylib-populate-install.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeFiles\c7c425f30d052c8f7d607dec3bf7be5f\raylib-populate-test.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeFiles\b6e5463de9d4ed5229d610a947d17d89\raylib-populate-complete.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeFiles\758f4c2a5cb6cffc46b7b4899d086757\raylib-populate.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\廖炜\Desktop\maze game\build\_deps\raylib-subbuild\CMakeFiles\raylib-populate" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{C4E69D94-7E8A-3CE3-8672-A575A66A558E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,14 @@
+# CMake generation dependency list for this directory.
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-src/src/external/glfw/CMake/glfw3Config.cmake.in
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-src/src/external/glfw/CMakeLists.txt
+D:/MingW64/share/cmake-3.31/Modules/BasicConfigVersion-SameMajorVersion.cmake.in
+D:/MingW64/share/cmake-3.31/Modules/CMakeDependentOption.cmake
+D:/MingW64/share/cmake-3.31/Modules/CMakePackageConfigHelpers.cmake
+D:/MingW64/share/cmake-3.31/Modules/CheckCSourceCompiles.cmake
+D:/MingW64/share/cmake-3.31/Modules/CheckIncludeFile.cmake
+D:/MingW64/share/cmake-3.31/Modules/CheckLibraryExists.cmake
+D:/MingW64/share/cmake-3.31/Modules/FindPackageHandleStandardArgs.cmake
+D:/MingW64/share/cmake-3.31/Modules/FindPackageMessage.cmake
+D:/MingW64/share/cmake-3.31/Modules/FindThreads.cmake
+D:/MingW64/share/cmake-3.31/Modules/GNUInstallDirs.cmake
+D:/MingW64/share/cmake-3.31/Modules/WriteBasicConfigVersionFile.cmake

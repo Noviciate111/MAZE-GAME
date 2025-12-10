@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\廖炜\Desktop\maze game\build\CMakeFiles\852085c04958432dd138d9674eb3cb53\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{9D41B1F1-8576-31CC-97B0-BBD0396E7E5C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
