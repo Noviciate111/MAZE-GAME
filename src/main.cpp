@@ -1,323 +1,41 @@
-#include <raylib.h>
+ï»¿#include <raylib.h>
 #include <format>
 
 int main(void) {
-    // ³õÊ¼»¯´°¿Ú£º¿í800¡¢¸ß450¡¢±êÌâ"Game"
+    // åˆå§‹åŒ–çª—å£ï¼ˆ800x450åˆ†è¾¨ç‡ï¼Œæ ‡é¢˜"Game"ï¼‰
     InitWindow(800, 450, "Game");
 
-    // ¼ÓÔØÍ¼Æ¬µ½ÄÚ´æ
     Image logo = LoadImage("../../resources/images/imastart.png");
-    // ½«ÄÚ´æÖĞµÄÍ¼Æ¬´«Êäµ½ÏÔ´æ£¨´´½¨ÎÆÀí£©
+    // å°†å›¾ç‰‡ä¸Šä¼ åˆ°æ˜¾å­˜ç”Ÿæˆçº¹ç†
     Texture2D texture = LoadTextureFromImage(logo);
-    // ÏÔ´æÒÑÓĞÎÆÀí£¬ÊÍ·ÅÄÚ´æÖĞµÄÍ¼Æ¬×ÊÔ´
+    // é‡Šæ”¾CPUå†…å­˜ä¸­çš„å›¾ç‰‡æ•°æ®ï¼ˆæ˜¾å­˜å·²å¤‡ä»½ï¼‰
     UnloadImage(logo);
 
-    // ´°¿ÚÎ´¹Ø±ÕÊ±³ÖĞøÑ­»·
+    // è®¡ç®—å›¾ç‰‡å±å¹•æ­£ä¸­å¤®çš„ä½ç½®
+    Vector2 position;
+    position.x = GetScreenWidth() / 2 - texture.width / 2;
+    position.y = GetScreenHeight() / 2 - texture.height / 2;
+
+    // æ¸¸æˆä¸»å¾ªç¯ï¼ˆçª—å£æœªå…³é—­æ—¶æŒç»­è¿è¡Œï¼‰
     while (!WindowShouldClose()) {
+        // å¼€å§‹ç»˜åˆ¶å¸§
         BeginDrawing();
-        // Çå¿Õ±³¾°Îª°×É«
+        // æ¸…ç©ºèƒŒæ™¯ä¸ºç™½è‰²
         ClearBackground(RAYWHITE);
 
-        // ÔÚÆÁÄ»ÕıÖĞ¼ä¾ÓÖĞ¶ÔÆë
-        DrawTexture(texture, (GetScreenWidth()/2) - (texture.width/2), (GetScreenHeight()/2) - (texture.height/2), WHITE);
-
-        // »æÖÆFPSĞÅÏ¢
+        // ç»˜åˆ¶å±…ä¸­çš„å›¾ç‰‡
+        DrawTexture(texture, position.x, position.y, WHITE);
+        // æ˜¾ç¤ºFPSå¸§ç‡
         DrawText(std::format("FPS: {}", GetFPS()).c_str(), 5, 5, 20, BLACK);
+
+        // ç»“æŸå½“å‰å¸§ç»˜åˆ¶
         EndDrawing();
     }
 
-    // ÊÍ·ÅÏÔ´æÖĞµÄÎÆÀí×ÊÔ´
+    // é‡Šæ”¾æ˜¾å­˜ä¸­çš„çº¹ç†èµ„æº
     UnloadTexture(texture);
-    // ¹Ø±Õ´°¿Ú
+    // å…³é—­çª—å£
     CloseWindow();
+
     return 0;
 }
-
-
-//´´½¨´°¿Ú
-// #include <raylib.h>
-// #include <format>
-
-// using namespace std;
-// int main(void) {
-//     // ³õÊ¼»¯´°¿Ú£¨¿í¡¢¸ß¡¢±êÌâ£©
-//     InitWindow(800, 450, "Game");
-
-//     // ÓÎÏ·Ö÷Ñ­»·£¨´°¿ÚÎ´¹Ø±ÕÊ±³ÖĞøÔËĞĞ£©
-//     while (!WindowShouldClose()) {
-//         BeginDrawing(); // ¿ªÊ¼»æÖÆ
-
-//         ClearBackground(RAYWHITE); // Çå¿Õ±³¾°Îª°×É«
-
-//         // »æÖÆÌáÊ¾ÎÄ×Ö£¨ÄÚÈİ¡¢X×ø±ê¡¢Y×ø±ê¡¢×ÖºÅ¡¢ÑÕÉ«£©
-//         DrawText("Maze Game", 320, 180, 26, BLACK);
-//         DrawText("Press the Spacebar to start.", 270, 220, 18, GRAY);
-        
-//         // »æÖÆFPSĞÅÏ¢
-//         DrawText(format("FPS: {}", GetFPS()).c_str(), 5, 5, 20, BLACK);
-
-//         EndDrawing(); // ½áÊø»æÖÆ
-//     }
-
-//     CloseWindow(); // ¹Ø±Õ´°¿Ú£¬ÊÍ·Å×ÊÔ´
-//     return 0;
-// }
-
-//»æÖÆÍ¼ĞÎ
-// #include <raylib.h>
-// #include <format >
-// int main(void){
-//     InitWindow(800, 450, "Game");
-
-//     //ÓÎÏ·Ö÷Ñ­»·
-//     while (!WindowShouldClose()){ //¼ì²âÊÇ·ñ¹Ø±ÕÁË´°¿Ú»ò°´ÏÂESC¼ü
-//         BeginDrawing();
-//         ClearBackground(RAYWHITE);
-
-//     //ÔÚ´°¿Ú»­Á½¸öÔ²
-//         DrawCircle(350, 300, 100, PINK);
-//         DrawCircle(450, 300, 100, GREEN);
-
-//         DrawText(std::format("FPS: {}", GetFPS()).c_str(), 5, 5, 20, BLACK);
-//         EndDrawing();
-//     }
-//     CloseWindow(); //¹Ø±Õ´°¿Ú»ØÊÕraylib×ÊÔ´
-//     return 0;
-// }
-
-// //Âß¼­ÇøÓë»æÍ¼Çø
-// #include <raylib.h>
-// #include <format>
-
-// int main(void) {
-//     // ³õÊ¼»¯´°¿Ú£º¿í800¡¢¸ß450¡¢±êÌâ"Game"
-//     InitWindow(800, 450, "Game");
-//     // Ô²ĞÎµÄy×ø±ê£¨³õÊ¼Öµ50£©
-//     float circle_y = 50.0F;
-
-//     // ´°¿ÚÎ´¹Ø±ÕÊ±³ÖĞøÑ­»·
-//     while (!WindowShouldClose()) {
-//         // Âß¼­Çø
-//         if (circle_y < 400) {
-//             // °´100µ¥Î»/ÃëµÄËÙ¶ÈÏòÏÂÒÆ¶¯Ô²ĞÎ
-//             circle_y += GetFrameTime() * 100;
-//         }
-
-//         // »æÍ¼Çø
-//         BeginDrawing();
-//         // Çå¿Õ±³¾°Îª°×É«
-//         ClearBackground(RAYWHITE);
-//         // »æÖÆ·ÛÉ«Ô²ĞÎ£ºÖĞĞÄ(400, circle_y)¡¢°ë¾¶50
-//         DrawCircle(400, circle_y, 50, PINK);
-//         // »æÖÆFPSĞÅÏ¢
-//         DrawText(std::format("FPS: {}", GetFPS()).c_str(), 5, 5, 20, BLACK);
-//         EndDrawing();
-//     }
-
-//     // ¹Ø±Õ´°¿Ú
-//     CloseWindow();
-//     return 0;
-// }
-
-//¶ÁÈ¡²¢ÏÔÊ¾Í¼Æ¬
-// #include <raylib.h>
-// #include <format>
-
-// int main(void) {
-//     // ³õÊ¼»¯´°¿Ú£º¿í800¡¢¸ß450¡¢±êÌâ"Game"
-//     InitWindow(800, 450, "Game");
-
-//     // ¼ÓÔØÍ¼Æ¬µ½ÄÚ´æ
-//     Image logo = LoadImage("../../resources/images/start.png");
-//     // ½«ÄÚ´æÖĞµÄÍ¼Æ¬´«Êäµ½ÏÔ´æ£¨´´½¨ÎÆÀí£©
-//     Texture2D texture = LoadTextureFromImage(logo);
-//     // ÏÔ´æÒÑÓĞÎÆÀí£¬ÊÍ·ÅÄÚ´æÖĞµÄÍ¼Æ¬×ÊÔ´
-//     UnloadImage(logo);
-
-//     // ´°¿ÚÎ´¹Ø±ÕÊ±³ÖĞøÑ­»·
-//     while (!WindowShouldClose()) {
-//         BeginDrawing();
-//         // Çå¿Õ±³¾°Îª°×É«
-//         ClearBackground(RAYWHITE);
-
-//         // ÔÚÆÁÄ»ÖĞ¼äÇøÓò»æÖÆÁ½¸ölogo£¨¾ÓÖĞ¶ÔÆë£©
-//         DrawTexture(texture, 300 - texture.width/2, 225 - texture.height/2, WHITE);
-//         DrawTexture(texture, 500 - texture.width/2, 225 - texture.height/2, WHITE);
-
-//         // »æÖÆFPSĞÅÏ¢
-//         DrawText(std::format("FPS: {}", GetFPS()).c_str(), 5, 5, 20, BLACK);
-//         EndDrawing();
-//     }
-
-//     // ÊÍ·ÅÏÔ´æÖĞµÄÎÆÀí×ÊÔ´
-//     UnloadTexture(texture);
-//     // ¹Ø±Õ´°¿Ú
-//     CloseWindow();
-//     return 0;
-// }
-
-//¼üÅÌÊäÈë¼ì²â
-// #include <raylib.h>
-// #include <format>
-
-// int main(void) {
-//     // ³õÊ¼»¯´°¿Ú£º¿í800¡¢¸ß450¡¢±êÌâ"Game"
-//     InitWindow(800, 450, "Game");
-
-//     // ¼ÓÔØÍ¼Æ¬µ½ÄÚ´æ
-//     Image logo = LoadImage("../../resources/images/start.png");
-//     // ½«ÄÚ´æÍ¼Æ¬´«Êäµ½ÏÔ´æ£¨´´½¨ÎÆÀí£©
-//     Texture2D texture = LoadTextureFromImage(logo);
-//     // ÊÍ·ÅÄÚ´æÖĞµÄÍ¼Æ¬×ÊÔ´
-//     UnloadImage(logo);
-
-//     // ×ó±ßlogoµÄÎ»ÖÃ£¨³õÊ¼¾ÓÖĞ£©
-//     Vector2 position;
-//     position.x = 300 - texture.width / 2;
-//     position.y = 225 - texture.height / 2;
-
-//     // ´°¿ÚÎ´¹Ø±ÕÊ±³ÖĞøÑ­»·
-//     while (!WindowShouldClose()) {
-//         // ¼üÅÌ¿ØÖÆ×ó±ßlogoÒÆ¶¯£¨ËÙ¶È100µ¥Î»/Ãë£©
-//         if (IsKeyDown(KEY_UP)) position.y -= GetFrameTime() * 100;
-//         if (IsKeyDown(KEY_DOWN)) position.y += GetFrameTime() * 100;
-//         if (IsKeyDown(KEY_LEFT)) position.x -= GetFrameTime() * 100;
-//         if (IsKeyDown(KEY_RIGHT)) position.x += GetFrameTime() * 100;
-
-//         // »æÍ¼Çø
-//         BeginDrawing();
-//         ClearBackground(RAYWHITE);
-
-//         // »æÖÆ×ó±ß¿ÉÒÆ¶¯µÄlogo
-//         DrawTextureV(texture, position, WHITE);
-//         // »æÖÆÓÒ±ß¹Ì¶¨µÄlogo
-//         DrawTexture(texture, 500 - texture.width / 2, 225 - texture.height / 2, WHITE);
-
-//         // ÏÔÊ¾FPS
-//         DrawText(std::format("FPS: {}", GetFPS()).c_str(), 5, 5, 20, BLACK);
-//         EndDrawing();
-//     }
-
-//     // ÏÈÊÍ·ÅÏÔ´æ×ÊÔ´£¬ÔÙ¹Ø±Õ´°¿Ú
-//     UnloadTexture(texture);
-//     CloseWindow();
-//     return 0;
-// }
-
-//¹Ø¼üÖ¡¶¯»­
-// #include <raylib.h>
-// #include <format>
-
-// int main(void) {
-//     // ³õÊ¼»¯´°¿Ú£º¿í800¡¢¸ß450¡¢±êÌâ"Game"
-//     InitWindow(800, 450, "Game");
-
-//     // ¼ÓÔØ½ÇÉ«ĞĞ×ßÍ¼µ½ÄÚ´æ
-//     Image sprite_sheet = LoadImage("../../resources/images/character.png");
-//     // ×ª»»ÎªÏÔ´æÎÆÀí
-//     Texture2D texture = LoadTextureFromImage(sprite_sheet);
-//     // ÊÍ·ÅÄÚ´æÖĞµÄÍ¼Æ¬×ÊÔ´
-//     UnloadImage(sprite_sheet);
-
-//     // ¾«ÁéÍ¼Îª4ĞĞ3ÁĞ£¬¼ÆËãµ¥Ö¡´óĞ¡
-//     float character_width = texture.width / 3;
-//     float character_height = texture.height / 4;
-//     // µ¥Ö¡ÇøÓò¾ØĞÎ£¨³õÊ¼ÎªµÚ0Ö¡£©
-//     Rectangle frame_rectangle = { 0.0F, 0.0F, character_width, character_height };
-
-//     // ½ÇÉ«³õÊ¼Î»ÖÃ£¨´°¿Ú¾ÓÖĞ£©
-//     Vector2 position{ 400.0F - character_width / 2, 225.0F - character_height / 2 };
-
-//     int curr_frame = 0;          // µ±Ç°²¥·ÅµÄ¹Ø¼üÖ¡ĞòºÅ
-//     float timer = 0;             // Ö¡ÇĞ»»¼ÆÊ±Æ÷
-//     float per_frame_time = 0.3;  // Ã¿Ö¡Í£ÁôÊ±¼ä£¨Ãë£©
-
-//     // ´°¿ÚÖ÷Ñ­»·
-//     while (!WindowShouldClose()) {
-//         // Ö¡¶¯»­Âß¼­
-//         timer += GetFrameTime();
-//         if (timer >= per_frame_time) {
-//             timer = 0;
-//             curr_frame = (curr_frame + 1) % 3;  // Ñ­»·ÇĞ»»0-2Ö¡
-//             // ¸üĞÂµ±Ç°Ö¡µÄ¾ØĞÎÇøÓò£¨XÖáÆ«ÒÆ£©
-//             frame_rectangle.x = curr_frame * character_width;
-//         }
-
-//         // »æÍ¼Çø
-//         BeginDrawing();
-//         ClearBackground(RAYWHITE);
-//         // »æÖÆµ±Ç°Ö¡µÄ½ÇÉ«
-//         DrawTextureRec(texture, frame_rectangle, position, WHITE);
-//         // ÏÔÊ¾FPS
-//         DrawText(std::format("FPS: {}", GetFPS()).c_str(), 5, 5, 20, BLACK);
-//         EndDrawing();
-//     }
-
-//     // ÊÍ·Å×ÊÔ´£¨ÏÈÊÍÎÆÀí£¬ÔÙ¹Ø´°¿Ú£©
-//     UnloadTexture(texture);
-//     CloseWindow();
-//     return 0;
-// }
-// #include <raylib.h>
-// #include <format>
-
-// int main(void) {
-//     InitWindow(800, 450, "Game");
-
-//     // ¼ÓÔØ4ĞĞ3ÁĞµÄ½ÇÉ«¾«ÁéÍ¼
-//     Image sprite_sheet = LoadImage("../../resources/images/character.png");
-//     Texture2D texture = LoadTextureFromImage(sprite_sheet);
-//     UnloadImage(sprite_sheet);
-
-//     // µ¥Ö¡´óĞ¡£¨4ĞĞ3ÁĞ£©
-//     float frame_w = texture.width / 3;
-//     float frame_h = texture.height / 4;
-//     Rectangle frame_rect = { 0.0F, 0.0F, frame_w, frame_h }; // Ö¡ÇøÓò
-
-//     // ½ÇÉ«×´Ì¬
-//     Vector2 pos = { 400 - frame_w/2, 225 - frame_h/2 }; // ³õÊ¼Î»ÖÃ
-//     int curr_frame = 0;      // µ±Ç°ÁĞ£¨0-2£©
-//     int curr_dir = 0;        // µ±Ç°·½Ïò£¨0:ÏÂ, 1:ÓÒ, 2:ÉÏ, 3:×ó£©
-//     float timer = 0;
-//     float per_frame_time = 0.3;
-//     float move_speed = 100;  // ÒÆ¶¯ËÙ¶È
-
-//     while (!WindowShouldClose()) {
-//         // 1. ·½Ïò¿ØÖÆ£¨ÇĞ»»¾«ÁéÍ¼µÄĞĞ£©
-//         if (IsKeyDown(KEY_DOWN)) {
-//             curr_dir = 0;
-//             pos.y += GetFrameTime() * move_speed;
-//         } else if (IsKeyDown(KEY_RIGHT)) {
-//             curr_dir = 2;
-//             pos.x += GetFrameTime() * move_speed;
-//         } else if (IsKeyDown(KEY_UP)) {
-//             curr_dir = 3;
-//             pos.y -= GetFrameTime() * move_speed;
-//         } else if (IsKeyDown(KEY_LEFT)) {
-//             curr_dir = 1;
-//             pos.x -= GetFrameTime() * move_speed;
-//         }
-
-//         // 2. Ö¡¶¯»­£¨ÇĞ»»¾«ÁéÍ¼µÄÁĞ£©
-//         timer += GetFrameTime();
-//         if (timer >= per_frame_time) {
-//             timer = 0;
-//             curr_frame = (curr_frame + 1) % 3; // Ñ­»·ÇĞ»»0-2ÁĞ
-//         }
-
-//         // 3. ¸üĞÂµ±Ç°Ö¡µÄ¾ØĞÎÇøÓò£¨ĞĞ=·½Ïò£¬ÁĞ=µ±Ç°Ö¡£©
-//         frame_rect.x = curr_frame * frame_w;
-//         frame_rect.y = curr_dir * frame_h;
-
-//         // »æÍ¼
-//         BeginDrawing();
-//         ClearBackground(RAYWHITE);
-//         DrawTextureRec(texture, frame_rect, pos, WHITE);
-//         DrawText(std::format("FPS: {}", GetFPS()).c_str(), 5, 5, 20, BLACK);
-//         EndDrawing();
-//     }
-
-//     UnloadTexture(texture);
-//     CloseWindow();
-//     return 0;
-// }
