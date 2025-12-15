@@ -21,7 +21,7 @@ bool GameManager::LoadStartImage() {
 }
 
 bool GameManager::Init() {
-    // 加载迷宫数据
+    // 加载迷宫数据（含DFS路径生成）
     if (!LoadMazeFromFile(maze, mazePath)) {
         return false;
     }
@@ -43,6 +43,13 @@ bool GameManager::Init() {
     return true;
 }
 
+// Shift键切换DFS路径显示/隐藏
+void GameManager::SwitchDFSPathState() {
+    if (IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT)) {
+        pathState = (pathState == PathState::HIDE) ? PathState::SHOW_DFS : PathState::HIDE;
+    }
+}
+
 void GameManager::DrawStartScene() {
     Vector2 logoPos = { 
         (float)(screenWidth / 2 - startImage.width / 2), 
@@ -53,9 +60,14 @@ void GameManager::DrawStartScene() {
 
 void GameManager::Run() {
     while (!WindowShouldClose()) {
-        // 空格键切换场景
+        // 空格键切换初始图片/迷宫场景
         if (IsKeyPressed(KEY_SPACE)) {
             isMazeScene = !isMazeScene;
+        }
+
+        // 迷宫场景下才允许切换DFS路径
+        if (isMazeScene) {
+            SwitchDFSPathState();
         }
 
         BeginDrawing();
@@ -64,7 +76,7 @@ void GameManager::Run() {
         if (!isMazeScene) {
             DrawStartScene();
         } else {
-            DrawMaze(maze);
+            DrawMaze(maze, pathState);
         }
 
         // 显示FPS

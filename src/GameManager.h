@@ -10,6 +10,7 @@ private:
     Maze maze;
     Texture2D startImage;  // 初始界面图片
     bool isMazeScene = false;
+    PathState pathState = PathState::HIDE; // DFS路径显示状态
     const string imagePath;
     const string mazePath;
     int screenWidth = 0;
@@ -19,6 +20,8 @@ private:
     bool LoadStartImage();
     // 绘制初始界面
     void DrawStartScene();
+    // Shift键切换DFS路径显示/隐藏
+    void SwitchDFSPathState();
 
 public:
     GameManager(const string& imgPath = "../../resources/images/", 

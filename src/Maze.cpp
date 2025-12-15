@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <raylib.h>
+#include <algorithm>
+#include <vector>
 
 bool LoadMazeFromFile(Maze& maze, const string& filePath) {
     ifstream file(filePath);
@@ -37,6 +39,9 @@ bool LoadMazeFromFile(Maze& maze, const string& filePath) {
     }
 
     file.close();
+    // 查找起点终点并生成DFS路径
+    FindStartEnd(maze);
+    DFSFindPath(maze);
     return true;
 }
 
@@ -49,13 +54,67 @@ void LoadMazeTextures(Maze& maze, const string& imagePath) {
     maze.texLava = LoadTexture((imagePath + "lava.png").c_str());
 }
 
-void DrawMaze(const Maze& maze) {
+void FindStartEnd(Maze& maze) {
+    for (int i = 0; i < maze.rows; i++) {
+        for (int j = 0; j < maze.cols; j++) {
+            if (maze.data[i][j] == -1) maze.startPos = {j, i};
+            if (maze.data[i][j] == -2) maze.endPos = {j, i};
+        }
+    }
+}
+
+// DFS递归辅助函数
+bool DFSHelper(Maze& maze, int x, int y, vector<vector<bool>>& visited, vector<pair<int, int>>& path) {
+    // 越界、墙、已访问则返回false
+    if (x < 0 || x >= maze.cols || y < 0 || y >= maze.rows || maze.data[y][x] == 1 || visited[y][x]) {
+        return false;
+    }
+
+    visited[y][x] = true;
+    path.push_back({x, y});
+
+    // 到达终点
+    if (x == maze.endPos.first && y == maze.endPos.second) {
+        return true;
+    }
+
+    // 上下左右四个方向遍历（左→右→上→下）
+    if (DFSHelper(maze, x - 1, y, visited, path) || 
+        DFSHelper(maze, x + 1, y, visited, path) || 
+        DFSHelper(maze, x, y - 1, visited, path) || 
+        DFSHelper(maze, x, y + 1, visited, path)) {
+        return true;
+    }
+
+    // 回溯：移除当前节点
+    path.pop_back();
+    return false;
+}
+
+// DFS路径查找主函数
+void DFSFindPath(Maze& maze) {
+    vector<vector<bool>> visited(maze.rows, vector<bool>(maze.cols, false));
+    DFSHelper(maze, maze.startPos.first, maze.startPos.second, visited, maze.dfsPath);
+}
+
+// 绘制DFS路径（红色半透明色块）
+void DrawDFSPath(const Maze& maze) {
+    for (auto& p : maze.dfsPath) {
+        int x = p.first * maze.tileSize;
+        int y = p.second * maze.tileSize;
+        // 路径色块内缩5像素，避免覆盖地块边缘
+        DrawRectangle(x + 5, y + 5, maze.tileSize - 10, maze.tileSize - 10, Fade(RED, 0.6f));
+    }
+}
+
+void DrawMaze(const Maze& maze, PathState pathState) {
+    // 绘制迷宫基础纹理
     for (int i = 0; i < maze.rows; i++) {
         for (int j = 0; j < maze.cols; j++) {
             int x = j * maze.tileSize;
             int y = i * maze.tileSize;
-            Rectangle src = { 0, 0, (float)maze.tileSize, (float)maze.tileSize };
-            Rectangle dst = { (float)x, (float)y, (float)maze.tileSize, (float)maze.tileSize };
+            Rectangle src = {0, 0, (float)maze.tileSize, (float)maze.tileSize};
+            Rectangle dst = {(float)x, (float)y, (float)maze.tileSize, (float)maze.tileSize};
 
             switch (maze.data[i][j]) {
                 case -1: DrawTexturePro(maze.texStart, src, dst, {0,0}, 0, WHITE); break;
@@ -67,6 +126,27 @@ void DrawMaze(const Maze& maze) {
                 default: DrawRectangle(x, y, maze.tileSize, maze.tileSize, GRAY); break;
             }
         }
+    }
+
+    // 显示DFS路径
+    if (pathState == PathState::SHOW_DFS && !maze.dfsPath.empty()) {
+        DrawDFSPath(maze);
+    }
+
+    // 绘制右上角路径说明
+    DrawDFSPathInfo(pathState);
+}
+
+// 绘制DFS路径说明文字
+void DrawDFSPathInfo(PathState pathState) {
+    int x = GetScreenWidth() - 180;
+    int y = 10;
+    int fontSize = 14;
+
+    if (pathState == PathState::SHOW_DFS) {
+        DrawText("Depth-First Search", x, y, fontSize, RED);
+    } else {
+        DrawText("Hide Path", x, y, fontSize, GRAY);
     }
 }
 
