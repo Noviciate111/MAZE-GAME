@@ -39,9 +39,10 @@ bool LoadMazeFromFile(Maze& maze, const string& filePath) {
     }
 
     file.close();
-    // 查找起点终点并生成DFS路径
+    // 查找起点终点并生成双路径
     FindStartEnd(maze);
     DFSFindPath(maze);
+    BFSFindPath(maze);
     return true;
 }
 
@@ -63,9 +64,8 @@ void FindStartEnd(Maze& maze) {
     }
 }
 
-// DFS递归辅助函数
+// DFS 递归辅助函数
 bool DFSHelper(Maze& maze, int x, int y, vector<vector<bool>>& visited, vector<pair<int, int>>& path) {
-    // 越界、墙、已访问则返回false
     if (x < 0 || x >= maze.cols || y < 0 || y >= maze.rows || maze.data[y][x] == 1 || visited[y][x]) {
         return false;
     }
@@ -73,37 +73,69 @@ bool DFSHelper(Maze& maze, int x, int y, vector<vector<bool>>& visited, vector<p
     visited[y][x] = true;
     path.push_back({x, y});
 
-    // 到达终点
     if (x == maze.endPos.first && y == maze.endPos.second) {
         return true;
     }
 
-    // 上下左右四个方向遍历（左→右→上→下）
-    if (DFSHelper(maze, x - 1, y, visited, path) || 
-        DFSHelper(maze, x + 1, y, visited, path) || 
-        DFSHelper(maze, x, y - 1, visited, path) || 
-        DFSHelper(maze, x, y + 1, visited, path)) {
+    // 上下左右遍历
+    if (DFSHelper(maze, x-1, y, visited, path) ||
+        DFSHelper(maze, x+1, y, visited, path) ||
+        DFSHelper(maze, x, y-1, visited, path) ||
+        DFSHelper(maze, x, y+1, visited, path)) {
         return true;
     }
 
-    // 回溯：移除当前节点
-    path.pop_back();
+    path.pop_back(); // 回溯
     return false;
 }
 
-// DFS路径查找主函数
 void DFSFindPath(Maze& maze) {
     vector<vector<bool>> visited(maze.rows, vector<bool>(maze.cols, false));
     DFSHelper(maze, maze.startPos.first, maze.startPos.second, visited, maze.dfsPath);
 }
 
-// 绘制DFS路径（红色半透明色块）
-void DrawDFSPath(const Maze& maze) {
-    for (auto& p : maze.dfsPath) {
+// BFS 路径查找
+void BFSFindPath(Maze& maze) {
+    vector<vector<bool>> visited(maze.rows, vector<bool>(maze.cols, false));
+    vector<vector<pair<int, int>>> parent(maze.rows, vector<pair<int, int>>(maze.cols, {-1, -1}));
+    queue<pair<int, int>> q;
+
+    q.push(maze.startPos);
+    visited[maze.startPos.second][maze.startPos.first] = true;
+
+    // 方向数组
+    int dirs[4][2] = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+
+    while (!q.empty()) {
+        auto curr = q.front();
+        q.pop();
+
+        if (curr == maze.endPos) break;
+
+        for (auto& dir : dirs) {
+            int nx = curr.first + dir[0];
+            int ny = curr.second + dir[1];
+            if (nx >=0 && nx < maze.cols && ny >=0 && ny < maze.rows && maze.data[ny][nx] != 1 && !visited[ny][nx]) {
+                visited[ny][nx] = true;
+                parent[ny][nx] = curr;
+                q.push({nx, ny});
+            }
+        }
+    }
+
+    // 回溯生成BFS路径
+    for (pair<int, int> p = maze.endPos; p != make_pair(-1, -1); p = parent[p.second][p.first]) {
+        maze.bfsPath.push_back(p);
+    }
+    reverse(maze.bfsPath.begin(), maze.bfsPath.end());
+}
+
+// 绘制路径通用函数
+void DrawPath(const Maze& maze, const vector<pair<int, int>>& path, Color color) {
+    for (auto& p : path) {
         int x = p.first * maze.tileSize;
         int y = p.second * maze.tileSize;
-        // 路径色块内缩5像素，避免覆盖地块边缘
-        DrawRectangle(x + 5, y + 5, maze.tileSize - 10, maze.tileSize - 10, Fade(RED, 0.6f));
+        DrawRectangle(x + 5, y + 5, maze.tileSize - 10, maze.tileSize - 10, Fade(color, 0.6f));
     }
 }
 
@@ -128,23 +160,26 @@ void DrawMaze(const Maze& maze, PathState pathState) {
         }
     }
 
-    // 显示DFS路径
+    // 根据状态绘制对应路径
     if (pathState == PathState::SHOW_DFS && !maze.dfsPath.empty()) {
-        DrawDFSPath(maze);
+        DrawPath(maze, maze.dfsPath, RED);
+    } else if (pathState == PathState::SHOW_BFS && !maze.bfsPath.empty()) {
+        DrawPath(maze, maze.bfsPath, BLUE);
     }
 
-    // 绘制右上角路径说明
-    DrawDFSPathInfo(pathState);
+    // 绘制路径说明
+    DrawPathInfo(pathState);
 }
 
-// 绘制DFS路径说明文字
-void DrawDFSPathInfo(PathState pathState) {
+void DrawPathInfo(PathState pathState) {
     int x = GetScreenWidth() - 180;
     int y = 10;
     int fontSize = 14;
 
     if (pathState == PathState::SHOW_DFS) {
         DrawText("Depth-First Search", x, y, fontSize, RED);
+    } else if (pathState == PathState::SHOW_BFS) {
+        DrawText("Breadth-First Search", x, y, fontSize, BLUE);
     } else {
         DrawText("Hide Path", x, y, fontSize, GRAY);
     }

@@ -8,30 +8,23 @@ using namespace std;
 class GameManager {
 private:
     Maze maze;
-    Texture2D startImage;  // 初始界面图片
+    Texture2D startImage;
     bool isMazeScene = false;
-    PathState pathState = PathState::HIDE; // DFS路径显示状态
+    PathState pathState = PathState::HIDE;
     const string imagePath;
     const string mazePath;
     int screenWidth = 0;
     int screenHeight = 0;
 
-    // 加载初始界面图片
     bool LoadStartImage();
-    // 绘制初始界面
     void DrawStartScene();
-    // Shift键切换DFS路径显示/隐藏
-    void SwitchDFSPathState();
+    void SwitchPathState(); // Shift键循环切换路径状态
 
 public:
     GameManager(const string& imgPath = "../../resources/images/", 
                 const string& mzPath = "../../resources/data/maze0.txt");
     ~GameManager();
-
-    // 游戏初始化
     bool Init();
-    // 游戏主循环
     void Run();
-    // 资源清理
     void Cleanup();
 };

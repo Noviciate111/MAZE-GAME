@@ -2,15 +2,16 @@
 #include <raylib.h>
 #include <vector>
 #include <string>
-#include <stack>
+#include <queue>
 #include <utility>
 
 using namespace std;
 
-// 路径显示状态
+// 路径显示状态枚举
 enum class PathState {
-    HIDE,  // 隐藏路径
-    SHOW_DFS // 显示DFS路径
+    HIDE,           // 隐藏所有路径
+    SHOW_DFS,       // 显示深度优先路径
+    SHOW_BFS        // 显示广度优先路径
 };
 
 struct Maze {
@@ -27,23 +28,26 @@ struct Maze {
     Texture2D texGrass;
     Texture2D texLava;
 
-    // DFS路径相关
+    // 路径相关
     pair<int, int> startPos;  // 起点坐标 (x,y) -> (列,行)
     pair<int, int> endPos;    // 终点坐标 (x,y)
-    vector<pair<int, int>> dfsPath; // DFS路径节点
+    vector<pair<int, int>> dfsPath; // DFS路径
+    vector<pair<int, int>> bfsPath; // BFS路径
 };
 
 // 迷宫文件加载
 bool LoadMazeFromFile(Maze& maze, const string& filePath);
 // 迷宫纹理加载
 void LoadMazeTextures(Maze& maze, const string& imagePath);
-// 迷宫绘制（含DFS路径）
+// 迷宫绘制（含路径）
 void DrawMaze(const Maze& maze, PathState pathState);
 // 迷宫纹理卸载
 void UnloadMazeTextures(const Maze& maze);
-// 查找迷宫起点和终点
+// 查找起点终点
 void FindStartEnd(Maze& maze);
-// DFS路径查找实现
+// DFS路径查找
 void DFSFindPath(Maze& maze);
+// BFS路径查找
+void BFSFindPath(Maze& maze);
 // 绘制路径说明文字
-void DrawDFSPathInfo(PathState pathState);
+void DrawPathInfo(PathState pathState);
