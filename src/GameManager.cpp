@@ -40,10 +40,15 @@ bool GameManager::Init() {
     }
     LoadMazeTextures(maze, imagePath);
 
+    // 初始化玩家
+    if (!player.Init(maze, imagePath)) {
+        return false;
+    }
+
     return true;
 }
 
-// Shift键循环切换路径算法
+// Shift键循环切换路径算法（匹配PathAlgorithm枚举值）
 void GameManager::SwitchPathAlgorithm() {
     if (IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT)) {
         if (currentAlgo == PathAlgorithm::NONE) {
@@ -73,9 +78,10 @@ void GameManager::Run() {
             isMazeScene = !isMazeScene;
         }
 
-        // 迷宫场景下才允许切换路径算法
+        // 迷宫场景下才允许切换路径算法和移动玩家
         if (isMazeScene) {
             SwitchPathAlgorithm();
+            player.Move(maze);
         }
 
         BeginDrawing();
@@ -84,7 +90,8 @@ void GameManager::Run() {
         if (!isMazeScene) {
             DrawStartScene();
         } else {
-            DrawMaze(maze, currentAlgo);
+            DrawMaze(maze, currentAlgo); // 传入PathAlgorithm枚举
+            player.Draw();
         }
 
         // 显示FPS
@@ -96,5 +103,6 @@ void GameManager::Run() {
 void GameManager::Cleanup() {
     UnloadTexture(startImage);
     UnloadMazeTextures(maze);
+    player.Unload();
     CloseWindow();
 }
