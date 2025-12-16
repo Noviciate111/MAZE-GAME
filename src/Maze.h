@@ -3,15 +3,18 @@
 #include <vector>
 #include <string>
 #include <queue>
-#include <utility>
+#include <stack>
+#include <map>
+#include <climits>
 
 using namespace std;
 
-// 路径显示状态枚举
-enum class PathState {
-    HIDE,           // 隐藏所有路径
-    SHOW_DFS,       // 显示深度优先路径
-    SHOW_BFS        // 显示广度优先路径
+// 路径算法类型枚举
+enum class PathAlgorithm {
+    NONE,
+    DFS,
+    BFS,
+    DIJKSTRA
 };
 
 struct Maze {
@@ -29,25 +32,28 @@ struct Maze {
     Texture2D texLava;
 
     // 路径相关
-    pair<int, int> startPos;  // 起点坐标 (x,y) -> (列,行)
+    pair<int, int> startPos;  // 起点坐标 (x,y)
     pair<int, int> endPos;    // 终点坐标 (x,y)
-    vector<pair<int, int>> dfsPath; // DFS路径
-    vector<pair<int, int>> bfsPath; // BFS路径
+    vector<pair<int, int>> dfsPath;   // DFS路径
+    vector<pair<int, int>> bfsPath;   // BFS路径
+    vector<pair<int, int>> dijkstraPath; // Dijkstra路径
 };
 
-// 迷宫文件加载
+// 迷宫文件加载函数
 bool LoadMazeFromFile(Maze& maze, const string& filePath);
-// 迷宫纹理加载
+// 迷宫纹理加载函数
 void LoadMazeTextures(Maze& maze, const string& imagePath);
-// 迷宫绘制（含路径）
-void DrawMaze(const Maze& maze, PathState pathState);
-// 迷宫纹理卸载
+// 迷宫绘制函数
+void DrawMaze(const Maze& maze, PathAlgorithm currentAlgo);
+// 迷宫纹理卸载函数
 void UnloadMazeTextures(const Maze& maze);
-// 查找起点终点
+// 查找起点和终点
 void FindStartEnd(Maze& maze);
-// DFS路径查找
+// DFS找路径
 void DFSFindPath(Maze& maze);
-// BFS路径查找
+// BFS找路径
 void BFSFindPath(Maze& maze);
+// Dijkstra找最短路径
+void DijkstraFindPath(Maze& maze);
 // 绘制路径说明文字
-void DrawPathInfo(PathState pathState);
+void DrawPathInfo(PathAlgorithm currentAlgo);
