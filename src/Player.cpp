@@ -11,12 +11,14 @@ Player::~Player() {
 }
 
 int Player::GetSpriteRowByDir() {
-    switch (dir) {
+    // 有当前移动方向时用 dir，无方向时用最后一次有效朝向 lastDir
+    Direction useDir = (dir != Direction::NONE) ? dir : lastDir;
+    switch (useDir) {
         case Direction::UP: return 3;
         case Direction::DOWN: return 0;
         case Direction::LEFT: return 1;
         case Direction::RIGHT: return 2;
-        default: return 0; // 默认向下
+        default: return 0;
     }
 }
 
@@ -138,11 +140,13 @@ void Player::Move(const Maze& maze) {
         // 重置动画状态
         frameTimer = 0.0f;
         currFrame = 0;
-    } else if (dir == Direction::NONE) {
-        // 静止时重置帧
-        currFrame = 1;
-        frameTimer = 0.0f;
-    }
+        lastDir = dir;
+    } 
+    // else if (dir == Direction::NONE) {
+    //     // 静止时重置帧
+    //     currFrame = 1;
+    //     frameTimer = 0.0f;
+    // }
 }
 
 void Player::Draw() {

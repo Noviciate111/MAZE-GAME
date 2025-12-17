@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Maze.h"
 #include <raylib.h>
 #include <string>
@@ -35,6 +35,7 @@ private:
     float baseMoveDuration; // 基础单格移动时长
     float currMoveDuration;// 当前移动时长（可根据地形调整）
 
+    Direction lastDir = Direction::DOWN;     // 上一次有效移动方向（用于静止时朝向）
     // 根据方向设置精灵图行索引
     int GetSpriteRowByDir();
     // 检查移动是否合法（非墙）
