@@ -162,3 +162,15 @@ void Player::Draw() {
 void Player::Unload() {
     UnloadTexture(texPlayer);
 }
+
+void Player::Reset(const Maze& maze) {
+    float offsetX = (float)(tileSize - frameWidth) / 2;
+    float offsetY = (float)(tileSize - frameHeight) / 2;
+    // 重置到迷宫起点位置
+    position.x = (float)(maze.startPos.first * tileSize + offsetX);
+    position.y = (float)(maze.startPos.second * tileSize + offsetY);
+    // 重置移动状态
+    isMoving = false;
+    moveProgress = 0.0f;
+    currFrame = 1; // 静止帧
+}

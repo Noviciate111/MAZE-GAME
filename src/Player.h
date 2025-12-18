@@ -55,6 +55,7 @@ public:
     void Draw();
     // 卸载纹理
     void Unload();
+    void Reset(const Maze& maze);
     // 新增：获取当前格子坐标（对外接口，用于检测终点/熔岩）
     pair<int, int> GetCurrentTile() const;
 };
