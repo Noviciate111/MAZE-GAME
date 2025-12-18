@@ -14,7 +14,8 @@ enum class PathAlgorithm {
     NONE,
     DFS,
     BFS,
-    DIJKSTRA
+    DIJKSTRA,
+    LAVA_DIJKSTRA
 };
 
 struct Maze {
@@ -37,6 +38,7 @@ struct Maze {
     vector<pair<int, int>> dfsPath;   // DFS路径
     vector<pair<int, int>> bfsPath;   // BFS路径
     vector<pair<int, int>> dijkstraPath; // Dijkstra路径
+    vector<pair<int, int>> lavaShortestPath; // 熔岩最短路径
 };
 
 // 迷宫文件加载函数
@@ -55,5 +57,9 @@ void DFSFindPath(Maze& maze);
 void BFSFindPath(Maze& maze);
 // Dijkstra找最短路径
 void DijkstraFindPath(Maze& maze);
+// 熔岩最短路径查找
+void LavaDijkstraFindPath(Maze& maze);
 // 绘制路径说明文字
 void DrawPathInfo(PathAlgorithm currentAlgo);
+//
+void GenerateRandomMaze(Maze& maze, int rows, int cols, int tileSize);

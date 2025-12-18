@@ -5,6 +5,10 @@
 GameManager::GameManager(const string& imgPath, const string& mzPath) 
     : imagePath(imgPath), mazePath(mzPath) {}
 
+// 重载构造函数：初始化随机迷宫参数
+GameManager::GameManager(const string& imgPath, const string& mzPath, bool randomMaze, int rows, int cols) 
+    : imagePath(imgPath), mazePath(mzPath), useRandomMaze(randomMaze), randomMazeRows(rows), randomMazeCols(cols) {}
+
 GameManager::~GameManager() {
     Cleanup();
 }
@@ -50,9 +54,15 @@ void GameManager::DrawGameStatus() {
 }
 
 bool GameManager::Init() {
-    // 加载迷宫数据
-    if (!LoadMazeFromFile(maze, mazePath)) {
+    if (useRandomMaze) {
+        // 模式1：生成随机迷宫（行数、列数建议设为奇数）
+        GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, 50);
+        TraceLog(LOG_INFO, "Generated random maze: %dx%d", randomMazeRows, randomMazeCols);
+    } else {
+        // 加载迷宫数据
+        if (!LoadMazeFromFile(maze, mazePath)) {
         return false;
+        }
     }
 
     // 计算窗口大小
@@ -92,6 +102,8 @@ void GameManager::SwitchPathAlgorithm() {
             currentAlgo = PathAlgorithm::BFS;
         } else if (currentAlgo == PathAlgorithm::BFS) {
             currentAlgo = PathAlgorithm::DIJKSTRA;
+        } else if (currentAlgo == PathAlgorithm::DIJKSTRA) {
+            currentAlgo = PathAlgorithm::LAVA_DIJKSTRA;
         } else {
             currentAlgo = PathAlgorithm::NONE;
         }
@@ -108,6 +120,16 @@ void GameManager::DrawStartScene() {
 
 void GameManager::Run() {
     while (!WindowShouldClose()) {
+        // 按 R 键生成新的随机迷宫（仅在随机模式下生效）
+        if (useRandomMaze && IsKeyPressed(KEY_R)) {
+            GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, 50);
+            // 重置玩家位置
+            player.Reset(maze);
+            // 重置游戏状态
+            isVictory = false;
+            isGameOver = false;
+            lavaCount = 0;
+        }
         // 空格键：场景切换 / 胜利/失败后重置游戏
         if (IsKeyPressed(KEY_SPACE)) {
             if (isVictory || isGameOver) {

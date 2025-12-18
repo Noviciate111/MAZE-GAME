@@ -22,6 +22,9 @@ private:
     bool isVictory = false;
     bool isGameOver = false;
     int lavaCount = 0;
+    bool useRandomMaze; // 新增：是否使用随机迷宫
+    int randomMazeRows; // 随机迷宫行数（建议奇数）
+    int randomMazeCols; // 随机迷宫列数（建议奇数）
 
     bool LoadStartImage();
     void DrawGameStatus();
@@ -37,6 +40,10 @@ private:
 public:
     GameManager(const string& imgPath = "../../resources/images/", 
                 const string& mzPath = "../../resources/data/maze0.txt");
+    // 重载构造函数：支持传入随机迷宫参数
+    GameManager(const string& imgPath = "../../resources/images/", 
+                const string& mzPath = "../../resources/data/maze0.txt",
+                bool randomMaze = false, int rows = 15, int cols = 15);            
     ~GameManager();
     // 游戏初始化
     bool Init();

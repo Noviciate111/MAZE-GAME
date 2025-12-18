@@ -3,6 +3,10 @@
 #include <sstream>
 #include <raylib.h>
 #include <algorithm>
+#include <tuple>
+#include <random>
+#include <ctime>
+
 
 bool LoadMazeFromFile(Maze& maze, const string& filePath) {
     ifstream file(filePath);
@@ -43,6 +47,7 @@ bool LoadMazeFromFile(Maze& maze, const string& filePath) {
     DFSFindPath(maze);
     BFSFindPath(maze);
     DijkstraFindPath(maze);
+    LavaDijkstraFindPath(maze);
     return true;
 }
 
@@ -222,6 +227,8 @@ void DrawMaze(const Maze& maze, PathAlgorithm currentAlgo) {
         DrawPath(maze, maze.bfsPath, BLUE);
     } else if (currentAlgo == PathAlgorithm::DIJKSTRA && !maze.dijkstraPath.empty()) {
         DrawPath(maze, maze.dijkstraPath, GREEN);
+    } else if (currentAlgo == PathAlgorithm::LAVA_DIJKSTRA && !maze.lavaShortestPath.empty()) {
+        DrawPath(maze, maze.lavaShortestPath, ORANGE);
     }
 
     // 绘制路径说明文字
@@ -240,9 +247,102 @@ void DrawPathInfo(PathAlgorithm currentAlgo) {
         DrawText("Breadth-First Search", x, y, fontSize, BLUE);
     } else if (currentAlgo == PathAlgorithm::DIJKSTRA) {
         DrawText("Shortest Path (Dijkstra)", x, y, fontSize, GREEN);
+    } else if (currentAlgo == PathAlgorithm::LAVA_DIJKSTRA) {
+        DrawText("Lava Shortest Path", x, y, fontSize, ORANGE);
     } else {
         DrawText("Hide Path", x, y, fontSize, GRAY);
     }
+}
+
+void LavaDijkstraFindPath(Maze& maze) {
+    // 方向数组：上下左右
+    int dirs[4][2] = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+    int rows = maze.rows;
+    int cols = maze.cols;
+
+    // 距离数组：dist[y][x][usedLava]，初始化为无穷大
+    const int INF = INT_MAX;
+    vector<vector<vector<int>>> dist(rows, vector<vector<int>>(cols, vector<int>(2, INF)));
+    // 父节点数组：记录每个状态的父节点 (px, py, pUsedLava)
+    vector<vector<vector<tuple<int, int, int>>>> parent(rows, vector<vector<tuple<int, int, int>>>(cols, vector<tuple<int, int, int>>(2, {-1, -1, -1})));
+
+    // 起点状态初始化
+    int startX = maze.startPos.first;
+    int startY = maze.startPos.second;
+    dist[startY][startX][0] = 0;
+    // 优先队列：(距离, x, y, usedLava)，小顶堆
+    priority_queue<tuple<int, int, int, int>, vector<tuple<int, int, int, int>>, greater<tuple<int, int, int, int>>> pq;
+    pq.push({0, startX, startY, 0});
+
+    while (!pq.empty()) {
+        auto [d, x, y, usedLava] = pq.top();
+        pq.pop();
+
+        // 到达终点，提前退出
+        if (x == maze.endPos.first && y == maze.endPos.second) {
+            break;
+        }
+        // 当前距离不是最短，跳过
+        if (d > dist[y][x][usedLava]) {
+            continue;
+        }
+
+        // 遍历四个方向
+        for (auto& dir : dirs) {
+            int nx = x + dir[0];
+            int ny = y + dir[1];
+            // 边界检测
+            if (nx < 0 || nx >= cols || ny < 0 || ny >= rows) {
+                continue;
+            }
+            // 墙不可走
+            if (maze.data[ny][nx] == 1) {
+                continue;
+            }
+
+            int newUsedLava = usedLava;
+            // 判断是否是熔岩，且未使用过熔岩次数
+            if (maze.data[ny][nx] == 3 && usedLava == 0) {
+                newUsedLava = 1; // 踩熔岩，状态切换为1
+            }
+            // 已使用过熔岩次数，不能再踩熔岩
+            else if (maze.data[ny][nx] == 3 && usedLava == 1) {
+                continue;
+            }
+
+            // 新路径距离 = 当前距离 + 1（所有可走地块权重都是1）
+            int newDist = d + 1;
+            // 更新最短距离
+            if (newDist < dist[ny][nx][newUsedLava]) {
+                dist[ny][nx][newUsedLava] = newDist;
+                parent[ny][nx][newUsedLava] = {x, y, usedLava};
+                pq.push({newDist, nx, ny, newUsedLava});
+            }
+        }
+    }
+
+    // 回溯生成路径：选择到达终点的最优状态（usedLava=0 或 1 中距离更短的）
+    int endX = maze.endPos.first;
+    int endY = maze.endPos.second;
+    int bestUsedLava = (dist[endY][endX][0] <= dist[endY][endX][1]) ? 0 : 1;
+    if (dist[endY][endX][bestUsedLava] == INF) {
+        TraceLog(LOG_WARNING, "No path found with one lava step allowed!");
+        return;
+    }
+
+    // 从终点回溯到起点
+    int currX = endX;
+    int currY = endY;
+    int currUsed = bestUsedLava;
+    while (currX != -1 && currY != -1) {
+        maze.lavaShortestPath.push_back({currX, currY});
+        auto [px, py, pUsed] = parent[currY][currX][currUsed];
+        currX = px;
+        currY = py;
+        currUsed = pUsed;
+    }
+    // 反转路径，得到起点到终点的顺序
+    reverse(maze.lavaShortestPath.begin(), maze.lavaShortestPath.end());
 }
 
 void UnloadMazeTextures(const Maze& maze) {
@@ -252,4 +352,107 @@ void UnloadMazeTextures(const Maze& maze) {
     UnloadTexture(maze.texWall);
     UnloadTexture(maze.texGrass);
     UnloadTexture(maze.texLava);
+}
+
+
+// 随机打乱方向数组
+void ShuffleDirections(vector<pair<int, int>>& dirs) {
+    static mt19937 rng((unsigned int)time(nullptr));
+    shuffle(dirs.begin(), dirs.end(), rng);
+}
+
+// 递归回溯法生成迷宫核心函数
+void RecursiveBacktracker(Maze& maze, int x, int y, vector<vector<bool>>& visited) {
+    visited[y][x] = true;
+    vector<pair<int, int>> dirs = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}};
+    ShuffleDirections(dirs);
+
+    for (auto& dir : dirs) {
+        int ny = y + dir.first;
+        int nx = x + dir.second;
+        // ========== 关键修改：限制 ny/nx 在 1 ~ rows-2 / cols-2 之间 ==========
+        if (ny >= 1 && ny <= maze.rows-2 && nx >= 1 && nx <= maze.cols-2 && !visited[ny][nx]) {
+            // 打通中间墙壁
+            int wallY = y + dir.first / 2;
+            int wallX = x + dir.second / 2;
+            maze.data[wallY][wallX] = 0;
+            maze.data[ny][nx] = 0;
+            RecursiveBacktracker(maze, nx, ny, visited);
+        }
+    }
+}
+
+// 生成随机迷宫入口函数
+void GenerateRandomMaze(Maze& maze, int rows, int cols, int tileSize) {
+    maze.rows = rows;
+    maze.cols = cols;
+    maze.tileSize = tileSize;
+    // 初始化全墙，包括外圈
+    maze.data.resize(rows, vector<int>(cols, 1));
+
+    mt19937 rng((unsigned int)time(nullptr));
+    // 起点：内圈奇数坐标（1 ≤ x ≤ cols-2，1 ≤ y ≤ rows-2）
+    uniform_int_distribution<int> oddDistX(0, (cols-3)/2);
+    uniform_int_distribution<int> oddDistY(0, (rows-3)/2);
+    int startX = 1 + oddDistX(rng) * 2;
+    int startY = 1 + oddDistY(rng) * 2;
+    maze.data[startY][startX] = -1;
+    maze.startPos = {startX, startY};
+
+    vector<vector<bool>> visited(rows, vector<bool>(cols, false));
+    RecursiveBacktracker(maze, startX, startY, visited);
+
+    // 终点：内圈边缘奇数坐标（y=1 / y=rows-2 / x=1 / x=cols-2）
+    vector<pair<int, int>> edgePoints;
+    // 上下内边缘（y=1 和 y=rows-2）
+    for (int x = 1; x <= cols-2; x += 2) {
+        edgePoints.emplace_back(x, 1);
+        edgePoints.emplace_back(x, rows-2);
+    }
+    // 左右内边缘（x=1 和 x=cols-2）
+    for (int y = 3; y <= rows-4; y += 2) { // 跳过上下边缘已添加的点
+        edgePoints.emplace_back(1, y);
+        edgePoints.emplace_back(cols-2, y);
+    }
+    // 随机选一个内边缘点作为终点
+    uniform_int_distribution<int> edgeDist(0, edgePoints.size()-1);
+    auto endPos = edgePoints[edgeDist(rng)];
+    maze.data[endPos.second][endPos.first] = -2;
+    maze.endPos = endPos;
+
+    // ========== 原有随机生成草地、熔岩的逻辑（不变） ==========
+    vector<pair<int, int>> pathTiles;
+    for (int y = 0; y < maze.rows; y++) {
+        for (int x = 0; x < maze.cols; x++) {
+            if (maze.data[y][x] == 0) {
+                pathTiles.emplace_back(x, y);
+            }
+        }
+    }
+
+    float grassRatio = 0.15f;
+    float lavaRatio = 0.05f;
+    int grassCount = (int)(pathTiles.size() * grassRatio);
+    int lavaCount = (int)(pathTiles.size() * lavaRatio);
+
+    shuffle(pathTiles.begin(), pathTiles.end(), rng);
+
+    for (int i = 0; i < grassCount && i < pathTiles.size(); i++) {
+        auto [x, y] = pathTiles[i];
+        maze.data[y][x] = 2;
+    }
+
+    int lavaIndex = grassCount;
+    while (lavaCount > 0 && lavaIndex < pathTiles.size()) {
+        auto [x, y] = pathTiles[lavaIndex];
+        maze.data[y][x] = 3;
+        lavaCount--;
+        lavaIndex++;
+    }
+
+    // 生成各算法路径
+    DFSFindPath(maze);
+    BFSFindPath(maze);
+    DijkstraFindPath(maze);
+    LavaDijkstraFindPath(maze);
 }
