@@ -73,6 +73,10 @@ bool Player::Init(const Maze& maze, const string& imagePath) {
     baseMoveDuration = (float)tileSize / 150.0f; // 150px/s 速度
     currMoveDuration = baseMoveDuration;
 
+    lastDir = Direction::DOWN;
+    dir = Direction::NONE;
+    currFrame = 1; // 静止帧
+
     return true;
 }
 
@@ -170,6 +174,8 @@ void Player::Reset(const Maze& maze) {
     position.x = (float)(maze.startPos.first * tileSize + offsetX);
     position.y = (float)(maze.startPos.second * tileSize + offsetY);
     // 重置移动状态
+    lastDir = Direction::DOWN;
+    dir = Direction::NONE;
     isMoving = false;
     moveProgress = 0.0f;
     currFrame = 1; // 静止帧
