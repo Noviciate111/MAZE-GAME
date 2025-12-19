@@ -382,8 +382,27 @@ void RecursiveBacktracker(Maze& maze, int x, int y, vector<vector<bool>>& visite
     }
 }
 
+// 统计路径上的熔岩数量
+int CountLavaOnPath(const Maze& maze, const vector<pair<int, int>>& path) {
+    int lavaCount = 0;
+    for (auto& p : path) {
+        int x = p.first;
+        int y = p.second;
+        if (maze.data[y][x] == 3) {
+            lavaCount++;
+        }
+    }
+    return lavaCount;
+}
+
 // 生成随机迷宫入口函数
 void GenerateRandomMaze(Maze& maze, int rows, int cols, int tileSize) {
+    // 清空所有旧路径
+    maze.dfsPath.clear();
+    maze.bfsPath.clear();
+    maze.dijkstraPath.clear();
+    maze.lavaShortestPath.clear();
+
     maze.rows = rows;
     maze.cols = cols;
     maze.tileSize = tileSize;
@@ -420,7 +439,8 @@ void GenerateRandomMaze(Maze& maze, int rows, int cols, int tileSize) {
     maze.data[endPos.second][endPos.first] = -2;
     maze.endPos = endPos;
 
-    // ========== 原有随机生成草地、熔岩的逻辑（不变） ==========
+    // 草地、熔岩生成
+    // 1. 收集所有通路格子（类型0）
     vector<pair<int, int>> pathTiles;
     for (int y = 0; y < maze.rows; y++) {
         for (int x = 0; x < maze.cols; x++) {
@@ -430,27 +450,49 @@ void GenerateRandomMaze(Maze& maze, int rows, int cols, int tileSize) {
         }
     }
 
+    // 2. 定义生成比例
     float grassRatio = 0.15f;
     float lavaRatio = 0.05f;
     int grassCount = (int)(pathTiles.size() * grassRatio);
-    int lavaCount = (int)(pathTiles.size() * lavaRatio);
+    int lavaCountTarget = (int)(pathTiles.size() * lavaRatio);
 
+    // 3. 生成草地（无需校验）
     shuffle(pathTiles.begin(), pathTiles.end(), rng);
-
     for (int i = 0; i < grassCount && i < pathTiles.size(); i++) {
         auto [x, y] = pathTiles[i];
         maze.data[y][x] = 2;
     }
 
-    int lavaIndex = grassCount;
-    while (lavaCount > 0 && lavaIndex < pathTiles.size()) {
-        auto [x, y] = pathTiles[lavaIndex];
-        maze.data[y][x] = 3;
-        lavaCount--;
-        lavaIndex++;
+    // 4. 生成熔岩：循环校验，确保最短路径（BFS）上熔岩数 ≤1
+    vector<pair<int, int>> lavaCandidates;
+    for (int i = grassCount; i < pathTiles.size(); i++) {
+        lavaCandidates.push_back(pathTiles[i]);
     }
 
-    // 生成各算法路径
+    int maxRetry = 10; // 最大重试次数，避免死循环
+    while (maxRetry-- > 0) {
+        // 临时生成熔岩
+        shuffle(lavaCandidates.begin(), lavaCandidates.end(), rng);
+        for (int i = 0; i < maze.rows; i++) {
+            for (int j = 0; j < maze.cols; j++) {
+                if (maze.data[i][j] == 3) maze.data[i][j] = 0; // 清空旧熔岩
+            }
+        }
+        for (int i = 0; i < lavaCountTarget && i < lavaCandidates.size(); i++) {
+            auto [x, y] = lavaCandidates[i];
+            maze.data[y][x] = 3;
+        }
+
+        // 生成BFS路径并校验熔岩数
+        BFSFindPath(maze); // 临时生成最短路径
+        int pathLava = CountLavaOnPath(maze, maze.bfsPath);
+        if (pathLava <= 1) {
+            break; // 符合要求，退出循环
+        }
+    }
+    maze.bfsPath.clear(); // 清空临时BFS路径，后续会重新生成
+
+    // 5. 重新生成所有路径（此时路径上熔岩数≤1）
     DFSFindPath(maze);
     BFSFindPath(maze);
     DijkstraFindPath(maze);

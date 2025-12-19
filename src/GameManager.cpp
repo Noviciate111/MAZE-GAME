@@ -129,6 +129,7 @@ void GameManager::Run() {
             isVictory = false;
             isGameOver = false;
             lavaCount = 0;
+            isOnLava = false;
         }
         // 空格键：场景切换 / 胜利/失败后重置游戏
         if (IsKeyPressed(KEY_SPACE)) {
