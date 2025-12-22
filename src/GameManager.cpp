@@ -5,9 +5,10 @@
 GameManager::GameManager(const string& imgPath, const string& mzPath) 
     : imagePath(imgPath), mazePath(mzPath) {}
 
-// 重载构造函数：初始化随机迷宫参数
+// 重载构造函数
 GameManager::GameManager(const string& imgPath, const string& mzPath, bool randomMaze, int rows, int cols) 
-    : imagePath(imgPath), mazePath(mzPath), useRandomMaze(randomMaze), randomMazeRows(rows), randomMazeCols(cols) {}
+    : imagePath(imgPath), mazePath(mzPath), useRandomMaze(randomMaze), randomMazeRows(rows), randomMazeCols(cols), isRandomMode(randomMaze) {} 
+// 初始化模式标记
 
 GameManager::~GameManager() {
     Cleanup();
@@ -120,12 +121,54 @@ void GameManager::DrawStartScene() {
 
 void GameManager::Run() {
     while (!WindowShouldClose()) {
-        // 按 R 键生成新的随机迷宫（仅在随机模式下生效）
-        if (useRandomMaze && IsKeyPressed(KEY_R)) {
+        // ===== 1. 检测 Ctrl+R：加载 maze0.txt 文件迷宫 =====
+        if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_R)) {
+            // 步骤1：清理旧迷宫资源
+            UnloadMazeTextures(maze);
+            // 清空所有路径
+            maze.dfsPath.clear();
+            maze.bfsPath.clear();
+            maze.dijkstraPath.clear();
+            maze.lavaShortestPath.clear();
+            // 步骤2：加载 maze0.txt 文件
+            if (LoadMazeFromFile(maze, mazePath)) {
+                TraceLog(LOG_INFO, "Loaded maze from file: %s", mazePath.c_str());
+                // 更新窗口尺寸（适配新迷宫）
+                screenWidth = maze.cols * maze.tileSize;
+                screenHeight = maze.rows * maze.tileSize;
+                SetWindowSize(screenWidth, screenHeight);
+                // 重新加载迷宫纹理
+                LoadMazeTextures(maze, imagePath);
+                // 重置玩家位置和游戏状态
+                player.Reset(maze);
+                isVictory = false;
+                isGameOver = false;
+                lavaCount = 0;
+                isOnLava = false;
+                // 切换为文件模式（禁用随机迷宫的 R 键刷新）
+                isRandomMode = false;
+            } else {
+                TraceLog(LOG_ERROR, "Failed to load maze0.txt!");
+            }
+        }
+        // 在 Run 方法的 Ctrl+R 逻辑下方添加
+        if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_SHIFT) && IsKeyPressed(KEY_R)) {
             GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, 50);
-            // 重置玩家位置
+            screenWidth = maze.cols * maze.tileSize;
+            screenHeight = maze.rows * maze.tileSize;
+            SetWindowSize(screenWidth, screenHeight);
+            LoadMazeTextures(maze, imagePath);
             player.Reset(maze);
-            // 重置游戏状态
+            isVictory = false;
+            isGameOver = false;
+            lavaCount = 0;
+            isOnLava = false;
+            isRandomMode = true; // 切回随机模式
+        }
+        // ===== 2. 原有 R 键：仅在随机模式下生成新随机迷宫 =====
+        if (isRandomMode && IsKeyPressed(KEY_R)) {
+            GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, 50);
+            player.Reset(maze);
             isVictory = false;
             isGameOver = false;
             lavaCount = 0;

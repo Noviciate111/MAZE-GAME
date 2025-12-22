@@ -36,6 +36,7 @@ private:
     bool LoadVictoryImage();
     bool LoadGameOverImage();
     bool isOnLava = false;
+    bool isRandomMode = false;
 
 public:
     GameManager(const string& imgPath = "../../resources/images/", 

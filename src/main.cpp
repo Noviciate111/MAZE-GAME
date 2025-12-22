@@ -2,13 +2,8 @@
 #include <raylib.h>
 
 int main() {
-    // ===== 模式1：生成随机迷宫 =====
-    // 参数说明：图片路径, 迷宫文件路径（无用）, 是否随机, 行数, 列数
-    GameManager game("../../resources/images/", "", true, 15, 15);
-
-    // ===== 模式2：加载文件迷宫（注释上面一行，启用下面一行） =====
-    // GameManager game("../../resources/images/", "../../resources/data/maze0.txt");
-
+    // 构造时传入 maze0.txt 的路径（即使初始是随机模式）
+    GameManager game("../../resources/images/", "../../resources/data/maze0.txt", true, 15, 15);
     if (!game.Init()) {
         TraceLog(LOG_ERROR, "Game initialization failed!");
         return -1;
