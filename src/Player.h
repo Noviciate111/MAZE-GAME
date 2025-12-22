@@ -47,6 +47,13 @@ public:
     Player();
     ~Player();
 
+    // 获取位置
+    Vector2 GetPosition() const { return position; }
+    void SetPosition(Vector2& newPos) { position = newPos; }
+    // 获取帧宽度
+    int GetFrameWidth() const { return frameWidth; }
+    // 获取帧高度
+    int GetFrameHeight() const { return frameHeight; }
     // 初始化：加载纹理+设置初始位置（迷宫起点）
     bool Init(const Maze& maze, const string& imagePath);
     // 玩家移动逻辑（平滑插值版）

@@ -25,6 +25,8 @@ add_executable(game
     src/Maze.h
     src/Player.cpp
     src/Player.h
+    src/Enemy.cpp
+    src/Enemy.h
 )
 
 target_link_libraries(game raylib)

@@ -339,6 +339,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\廖炜\Desktop\maze game\src\Maze.h" />
     <ClCompile Include="C:\Users\廖炜\Desktop\maze game\src\Player.cpp" />
     <ClInclude Include="C:\Users\廖炜\Desktop\maze game\src\Player.h" />
+    <ClCompile Include="C:\Users\廖炜\Desktop\maze game\src\Enemy.cpp" />
+    <ClInclude Include="C:\Users\廖炜\Desktop\maze game\src\Enemy.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
