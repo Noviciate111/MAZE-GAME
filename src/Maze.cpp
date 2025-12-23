@@ -102,24 +102,30 @@ void DFSFindPath(Maze& maze) {
 
 // BFS路径查找
 void BFSFindPath(Maze& maze) {
-    vector<vector<bool>> visited(maze.rows, vector<bool>(maze.cols, false));
+    vector<vector<int>> dist(maze.rows, vector<int>(maze.cols, INT_MAX));
     vector<vector<pair<int, int>>> parent(maze.rows, vector<pair<int, int>>(maze.cols, {-1, -1}));
-    queue<pair<int, int>> q;
+    // 优先队列：(总距离, x, y)
+    priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<>> pq;
 
-    q.push(maze.startPos);
-    visited[maze.startPos.second][maze.startPos.first] = true;
+    int startX = maze.startPos.first;
+    int startY = maze.startPos.second;
+    dist[startY][startX] = 0;
+    pq.push({0, {startX, startY}});
 
     // 方向数组：上下左右
     int dirs[4][2] = {{-1,0}, {1,0}, {0,-1}, {0,1}};
 
-    while (!q.empty()) {
-        auto curr = q.front();
-        q.pop();
+    while (!pq.empty()) {
+        auto curr = pq.top();
+        pq.pop();
+        int d = curr.first;
+        int x = curr.second.first;
+        int y = curr.second.second;
 
-        // 到达终点
-        if (curr == maze.endPos) {
-            // 回溯父节点生成路径
-            for (pair<int, int> p = curr; p != make_pair(-1, -1); p = parent[p.second][p.first]) {
+        if (x == maze.endPos.first && y == maze.endPos.second) {
+            // 回溯路径
+            maze.bfsPath.clear();
+            for (pair<int, int> p = curr.second; p != make_pair(-1, -1); p = parent[p.second][p.first]) {
                 maze.bfsPath.push_back(p);
             }
             reverse(maze.bfsPath.begin(), maze.bfsPath.end());
@@ -128,18 +134,26 @@ void BFSFindPath(Maze& maze) {
 
         // 遍历四个方向
         for (auto& dir : dirs) {
-            int nx = curr.first + dir[0];
-            int ny = curr.second + dir[1];
-            if (nx >=0 && nx < maze.cols && ny >=0 && ny < maze.rows && maze.data[ny][nx] != 1 && !visited[ny][nx]) {
-                visited[ny][nx] = true;
-                parent[ny][nx] = curr;
-                q.push({nx, ny});
+            int nx = x + dir[0];
+            int ny = y + dir[1];
+            if (nx < 0 || nx >= maze.cols || ny < 0 || ny >= maze.rows || maze.data[ny][nx] == 1) {
+                continue;
+            }
+
+            int cost = 1;
+            if (maze.data[ny][nx] == 2) cost = 3;
+            else if (maze.data[ny][nx] == 3) cost = 1000;
+
+            if (dist[ny][nx] > d + cost) {
+                dist[ny][nx] = d + cost;
+                parent[ny][nx] = {x, y};
+                pq.push({dist[ny][nx], {nx, ny}});
             }
         }
     }
 }
 
-// Dijkstra最短路径（所有可走地块权重为1）
+// Dijkstra最短路径
 void DijkstraFindPath(Maze& maze) {
     // 距离数组，初始为无穷大
     vector<vector<int>> dist(maze.rows, vector<int>(maze.cols, INT_MAX));
@@ -173,17 +187,22 @@ void DijkstraFindPath(Maze& maze) {
         for (auto& dir : dirs) {
             int nx = x + dir[0];
             int ny = y + dir[1];
-            if (nx >=0 && nx < maze.cols && ny >=0 && ny < maze.rows && maze.data[ny][nx] != 1 && !visited[ny][nx]) {
-                if (dist[ny][nx] > d + 1) {
-                    dist[ny][nx] = d + 1;
-                    parent[ny][nx] = {x, y};
-                    pq.push({dist[ny][nx], {nx, ny}});
-                }
+            if (nx < 0 || nx >= maze.cols || ny < 0 || ny >= maze.rows || maze.data[ny][nx] == 1) {
+                continue;
+            }
+            int cost = 1; // 普通地板
+            if (maze.data[ny][nx] == 2) cost = 3; // 草地成本3
+            else if (maze.data[ny][nx] == 3) cost = 1000; // 熔岩成本1000
+            if (dist[ny][nx] > d + cost) {
+                dist[ny][nx] = d + cost;
+                parent[ny][nx] = {x, y};
+                pq.push({dist[ny][nx], {nx, ny}});
             }
         }
     }
 
     // 回溯生成路径
+    maze.dijkstraPath.clear();
     for (pair<int, int> p = maze.endPos; p != make_pair(-1, -1); p = parent[p.second][p.first]) {
         maze.dijkstraPath.push_back(p);
     }
@@ -398,6 +417,9 @@ int CountLavaOnPath(const Maze& maze, const vector<pair<int, int>>& path) {
 // 生成随机迷宫入口函数
 void GenerateRandomMaze(Maze& maze, int rows, int cols, int tileSize) {
     // 清空所有旧路径
+    maze.data.clear();
+    maze.data.resize(rows, vector<int>(cols, 1)); // 全墙初始化
+
     maze.dfsPath.clear();
     maze.bfsPath.clear();
     maze.dijkstraPath.clear();
@@ -406,8 +428,6 @@ void GenerateRandomMaze(Maze& maze, int rows, int cols, int tileSize) {
     maze.rows = rows;
     maze.cols = cols;
     maze.tileSize = tileSize;
-    // 初始化全墙，包括外圈
-    maze.data.resize(rows, vector<int>(cols, 1));
 
     mt19937 rng((unsigned int)time(nullptr));
     // 起点：内圈奇数坐标（1 ≤ x ≤ cols-2，1 ≤ y ≤ rows-2）
@@ -454,7 +474,7 @@ void GenerateRandomMaze(Maze& maze, int rows, int cols, int tileSize) {
     float grassRatio = 0.15f;
     float lavaRatio = 0.05f;
     int grassCount = (int)(pathTiles.size() * grassRatio);
-    int lavaCountTarget = (int)(pathTiles.size() * lavaRatio);
+    int lavaCountTarget = min((int)(pathTiles.size() * lavaRatio), 7);
 
     // 3. 生成草地（无需校验）
     shuffle(pathTiles.begin(), pathTiles.end(), rng);
@@ -484,8 +504,8 @@ void GenerateRandomMaze(Maze& maze, int rows, int cols, int tileSize) {
         }
 
         // 生成BFS路径并校验熔岩数
-        BFSFindPath(maze); // 临时生成最短路径
-        int pathLava = CountLavaOnPath(maze, maze.bfsPath);
+        LavaDijkstraFindPath(maze); // 用熔岩最短路径算法校验
+        int pathLava = CountLavaOnPath(maze, maze.lavaShortestPath); // 校验LavaDijkstra路径
         if (pathLava <= 1) {
             break; // 符合要求，退出循环
         }

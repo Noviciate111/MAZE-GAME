@@ -29,7 +29,7 @@ private:
 
     Enemy* enemy;                // 史莱姆敌人
     int enemyCollisionCount;     // 敌人碰撞计数（0/1/2）
-     float enemyCollisionCooldown; // 碰撞冷却时间（秒）
+    float enemyCollisionCooldown; // 碰撞冷却时间（秒）
     float enemyCollisionTimer;    // 碰撞冷却计时器
     
     bool LoadStartImage();

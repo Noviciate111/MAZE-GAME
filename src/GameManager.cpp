@@ -99,7 +99,7 @@ bool GameManager::Init() {
         return false;
         }
     }else {
-        enemy->Reset(maze.endPos, maze.tileSize);
+        enemy->Reset(maze.endPos, maze.tileSize, maze);
     }
     enemyCollisionCount = 0;
     // 初始化玩家
@@ -138,7 +138,7 @@ void GameManager::DrawStartScene() {
 void GameManager::Run() {
     while (!WindowShouldClose()) {
         enemyCollisionTimer += GetFrameTime();
-        // ===== 1. 检测 Ctrl+R：加载 maze0.txt 文件迷宫 =====
+        // 1. 检测 Ctrl+R：加载 maze0.txt 文件迷宫
         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_R)) {
             // 步骤1：清理旧迷宫资源
             UnloadMazeTextures(maze);
@@ -158,7 +158,7 @@ void GameManager::Run() {
                 LoadMazeTextures(maze, imagePath);
                 // 重置玩家位置和游戏状态
                 player.Reset(maze);
-                if(enemy) enemy->Reset(maze.endPos, maze.tileSize);
+                if(enemy) enemy->Reset(maze.endPos, maze.tileSize, maze);
                 isVictory = false;
                 isGameOver = false;
                 lavaCount = 0;
@@ -172,13 +172,16 @@ void GameManager::Run() {
         }
         // 在 Run 方法的 Ctrl+R 逻辑下方添加
         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_SHIFT) && IsKeyPressed(KEY_R)) {
+            maze.startPos = {1, 1};
+            maze.endPos = {-1, -1}; // 重置终点，等待生成时设置
+            // 生成新随机迷宫
             GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, 50);
             screenWidth = maze.cols * maze.tileSize;
             screenHeight = maze.rows * maze.tileSize;
             SetWindowSize(screenWidth, screenHeight);
             LoadMazeTextures(maze, imagePath);
             player.Reset(maze);
-            if(enemy) enemy->Reset(maze.endPos, maze.tileSize);
+            if(enemy) enemy->Reset(maze.endPos, maze.tileSize, maze);
             isVictory = false;
             isGameOver = false;
             lavaCount = 0;
@@ -186,11 +189,11 @@ void GameManager::Run() {
             enemyCollisionCount = 0;
             isRandomMode = true; // 切回随机模式
         }
-        // ===== 2. 原有 R 键：仅在随机模式下生成新随机迷宫 =====
+        // 2. 原有 R 键：仅在随机模式下生成新随机迷宫
         if (isRandomMode && IsKeyPressed(KEY_R)) {
             GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, 50);
             player.Reset(maze);
-            if(enemy) enemy->Reset(maze.endPos, maze.tileSize);
+            if(enemy) enemy->Reset(maze.endPos, maze.tileSize, maze);
             isVictory = false;
             isGameOver = false;
             lavaCount = 0;
@@ -207,7 +210,7 @@ void GameManager::Run() {
                 enemyCollisionCount = 0;
                 // 重置玩家位置（需确保 Player 类有 Reset 方法）
                 player.Reset(maze);
-                if(enemy) enemy->Reset(maze.endPos, maze.tileSize);
+                if(enemy) enemy->Reset(maze.endPos, maze.tileSize, maze);
             } else {
                 isMazeScene = !isMazeScene;
             }
@@ -222,7 +225,7 @@ void GameManager::Run() {
             enemy->Update(maze, playerSpeed);
             // 在 Run 方法的检测分支中修改
             auto [tileX, tileY] = player.GetCurrentTile();
-            // 1. 检测熔岩：仅当 进入熔岩时 计数
+            // 检测熔岩：仅当 进入熔岩时 计数
             bool currOnLava = (maze.data[tileY][tileX] == 3);
             if (currOnLava && !isOnLava) {
                 lavaCount++;
@@ -231,7 +234,12 @@ void GameManager::Run() {
                     isGameOver = true;
                 }
             }
-            isOnLava = currOnLava; // 更新上一帧状态
+            if(lavaCount >= 2) {
+                isGameOver = true;
+                TraceLog(LOG_INFO, "熔岩计数达到2，游戏结束！");
+            }
+            isOnLava = currOnLava;
+            // 检测敌人碰撞
             if (CheckPlayerEnemyCollision()&& enemyCollisionTimer >= enemyCollisionCooldown) {
                 enemyCollisionCount++;
                 enemyCollisionTimer = 0.0f;
@@ -243,9 +251,10 @@ void GameManager::Run() {
                 }
                 if (enemyCollisionCount >= 2 || (lavaCount >= 1 && enemyCollisionCount >= 1)) {
                     isGameOver = true;
+                    TraceLog(LOG_INFO, "敌人碰撞/熔岩+碰撞计数达到2，游戏结束！");
                 }
             }
-            // 2. 检测终点（原有逻辑不变）
+            // 检测终点
             if (tileX == maze.endPos.first && tileY == maze.endPos.second) {
                 isVictory = true;
             }

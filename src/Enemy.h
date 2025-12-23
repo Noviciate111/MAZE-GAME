@@ -44,7 +44,7 @@ public:
     // 绘制敌人（带动画）
     void Draw();
     // 重置敌人位置（新迷宫生成时调用）
-    void Reset(pair<int, int> newEndPos, int newTileSize);
+    void Reset(pair<int, int> newEndPos, int newTileSize, const Maze& maze);
     // 卸载纹理
     void Unload();
 
