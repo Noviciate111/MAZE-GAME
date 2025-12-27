@@ -57,6 +57,11 @@ bool Player::Init(const Maze& maze, const string& imagePath) {
     texPlayer = LoadTextureFromImage(img);
     UnloadImage(img);
 
+    // 新增：检测纹理加载是否成功
+    if (texPlayer.id == 0) {
+        TraceLog(LOG_ERROR, "Failed to create player texture from image!");
+        return false;
+    }
     // 计算单帧大小
     frameWidth = texPlayer.width / 3;
     frameHeight = texPlayer.height / 4;
@@ -83,10 +88,8 @@ bool Player::Init(const Maze& maze, const string& imagePath) {
 void Player::Move(const Maze& maze) {
     // 移动中时，执行插值计算
     if (isMoving) {
-        // 累加移动进度
-        moveProgress += GetFrameTime() / currMoveDuration;
-        if (moveProgress < 0.0f) moveProgress = 0.0f;
-        else if (moveProgress > 1.0f) moveProgress = 1.0f;
+        // 优化：用clamp限制进度范围，避免数值溢出
+        moveProgress = clamp(moveProgress + GetFrameTime() / currMoveDuration, 0.0f, 1.0f);
 
         // 线性插值计算当前位置
         position.x = moveStartPos.x + (moveTargetPos.x - moveStartPos.x) * moveProgress;
@@ -146,11 +149,6 @@ void Player::Move(const Maze& maze) {
         currFrame = 0;
         lastDir = dir;
     } 
-    // else if (dir == Direction::NONE) {
-    //     // 静止时重置帧
-    //     currFrame = 1;
-    //     frameTimer = 0.0f;
-    // }
 }
 
 void Player::Draw() {

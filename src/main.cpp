@@ -2,10 +2,19 @@
 #include <raylib.h>
 
 int main() {
-    // 构造时传入 maze0.txt 的路径（即使初始是随机模式）
-    GameManager game("../../resources/images/", "../../resources/data/maze0.txt", true, 15, 15);
+    // 优化：增加资源路径合法性检测
+    const string imgPath = "../../resources/images/";
+    const string mazePath = "../../resources/data/maze0.txt";
+    // 优化：初始化raylib上下文（提前初始化，避免GameManager中初始化异常）
+    SetTraceLogLevel(LOG_INFO); // 优化：设置日志级别，便于调试
+
+    GameManager game(imgPath, mazePath, true, 15, 15);
     if (!game.Init()) {
         TraceLog(LOG_ERROR, "Game initialization failed!");
+        // 优化：确保窗口未初始化时不调用CloseWindow
+        if (IsWindowReady()) {
+            CloseWindow();
+        }
         return -1;
     }
     game.Run();

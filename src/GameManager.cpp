@@ -14,8 +14,9 @@ GameManager::~GameManager() {
     if(enemy != nullptr) {
         enemy->Unload();
         delete enemy;
+        enemy = nullptr;// 优化：防止悬空指针
     }
-    Cleanup();
+    // Cleanup();
 }
 
 bool GameManager::LoadStartImage() {
@@ -62,8 +63,10 @@ void GameManager::DrawGameStatus() {
 
 bool GameManager::Init() {
     if (useRandomMaze) {
-        // 模式1：生成随机迷宫（行数、列数建议设为奇数）
-        GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, 50);
+        // 生成随机迷宫
+        // 在GameManager的Init/Run中调用GenerateRandomMaze时（优化）：
+        GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, maze.tileSize);
+        // GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, 50);
         TraceLog(LOG_INFO, "Generated random maze: %dx%d", randomMazeRows, randomMazeCols);
     } else {
         // 加载迷宫数据
@@ -110,19 +113,33 @@ bool GameManager::Init() {
     return true;
 }
 
-// Shift键循环切换路径算法（匹配PathAlgorithm枚举值）
+// 优化：Shift+数字键精准切换路径算法
 void GameManager::SwitchPathAlgorithm() {
-    if (IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT)) {
-        if (currentAlgo == PathAlgorithm::NONE) {
-            currentAlgo = PathAlgorithm::DFS;
-        } else if (currentAlgo == PathAlgorithm::DFS) {
-            currentAlgo = PathAlgorithm::BFS;
-        } else if (currentAlgo == PathAlgorithm::BFS) {
-            currentAlgo = PathAlgorithm::DIJKSTRA;
-        } else if (currentAlgo == PathAlgorithm::DIJKSTRA) {
-            currentAlgo = PathAlgorithm::LAVA_DIJKSTRA;
-        } else {
+    // Shift+1 → 隐藏路径（NONE）
+    if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
+        if (IsKeyPressed(KEY_ONE)) {
             currentAlgo = PathAlgorithm::NONE;
+            TraceLog(LOG_INFO, "Switched to: Hide Path");
+        }
+        // Shift+2 → DFS路径
+        else if (IsKeyPressed(KEY_TWO)) {
+            currentAlgo = PathAlgorithm::DFS;
+            TraceLog(LOG_INFO, "Switched to: DFS Path");
+        }
+        // Shift+3 → BFS路径
+        else if (IsKeyPressed(KEY_THREE)) {
+            currentAlgo = PathAlgorithm::BFS;
+            TraceLog(LOG_INFO, "Switched to: BFS Path");
+        }
+        // Shift+4 → Dijkstra路径
+        else if (IsKeyPressed(KEY_FOUR)) {
+            currentAlgo = PathAlgorithm::DIJKSTRA;
+            TraceLog(LOG_INFO, "Switched to: Dijkstra Path");
+        }
+        // 可选：Shift+5 → 熔岩Dijkstra路径
+        else if (IsKeyPressed(KEY_FIVE)) {
+            currentAlgo = PathAlgorithm::LAVA_DIJKSTRA;
+            TraceLog(LOG_INFO, "Switched to: Lava Dijkstra Path");
         }
     }
 }
@@ -289,17 +306,20 @@ bool GameManager::LoadGameOverImage() {
 }
 
 bool GameManager::CheckPlayerEnemyCollision() {
-    // 玩家碰撞盒
+    // 玩家碰撞盒（优化：增加居中偏移）
     Vector2 playerPos = player.GetPosition();
-    int pWidth = player.GetFrameWidth();
-    int pHeight = player.GetFrameHeight();
+    int pOffsetX = (maze.tileSize - player.GetFrameWidth()) / 2;
+    int pOffsetY = (maze.tileSize - player.GetFrameHeight()) / 2;
     Rectangle playerRect = {
-        playerPos.x, playerPos.y,
-        (float)pWidth, (float)pHeight
+        playerPos.x + pOffsetX, playerPos.y + pOffsetY,
+        (float)player.GetFrameWidth(), (float)player.GetFrameHeight()
     };
-    // 敌人碰撞盒
+
+    // 敌人碰撞盒（优化：增加居中偏移）
+    int eOffsetX = (maze.tileSize - enemy->frameWidth) / 2;
+    int eOffsetY = (maze.tileSize - enemy->frameHeight) / 2;
     Rectangle enemyRect = {
-        enemy->position.x, enemy->position.y,
+        enemy->position.x + eOffsetX, enemy->position.y + eOffsetY,
         (float)enemy->frameWidth, (float)enemy->frameHeight
     };
     return CheckCollisionRecs(playerRect, enemyRect);
