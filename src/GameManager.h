@@ -14,6 +14,9 @@ private:
     Texture2D startImage;    
     Texture2D victoryImage;
     Texture2D gameOverImage;
+    Texture2D gameOverEnemyImage;
+    int deathType = 0; // 新增：死亡类型标记 0=未死 1=熔岩死亡 2=怪物死亡
+    int lastDeathTrigger = 0; // 新增：记录最后一次触发死亡的原因 1=熔岩 2=怪物
     bool isMazeScene = false;
     PathAlgorithm currentAlgo = PathAlgorithm::NONE; // 修正：用PathAlgorithm枚举
     const string imagePath;  // 图片资源路径
@@ -41,6 +44,7 @@ private:
     // 加载胜利图片
     bool LoadVictoryImage();
     bool LoadGameOverImage();
+    bool LoadGameOverEnemyImage();
     bool isOnLava = false;
     bool isRandomMode = false;
     //检测玩家与敌人碰撞

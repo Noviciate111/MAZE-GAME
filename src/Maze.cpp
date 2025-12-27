@@ -176,7 +176,7 @@ void DijkstraFindPath(Maze& maze) {
                 continue;
             }
 
-            // 核心修复：严格按成本定义计算
+            // 严格按成本定义计算
             int cost = 1; // 地板
             if (maze.data[ny][nx] == 2) cost = 3; // 草地
             else if (maze.data[ny][nx] == 3) cost = 1000; // 岩浆（等效不可走）
@@ -189,7 +189,7 @@ void DijkstraFindPath(Maze& maze) {
         }
     }
 
-    // 回溯路径
+    // 回溯路径（不变）
     maze.dijkstraPath.clear();
     for (pair<int, int> p = maze.endPos; p != make_pair(-1, -1); p = parent[p.second][p.first]) {
         maze.dijkstraPath.push_back(p);
@@ -238,7 +238,7 @@ void LavaDijkstraFindPath(Maze& maze) {
             if (maze.data[ny][nx] == 2) {
                 cost = 3; // 草地成本3
             } else if (maze.data[ny][nx] == 3) {
-                // ===== 核心修复：动态调整岩浆成本 =====
+                // 动态调整岩浆成本 
                 if (usedLava == 0) {
                     newUsedLava = 1; // 第一次踩岩浆，标记状态
                     cost = 1; // 第一次踩岩浆成本=1（允许）

@@ -55,9 +55,16 @@ void GameManager::DrawGameStatus() {
     }
     // 绘制失败图片
     if (isGameOver) {
-        int imgX = (screenWidth - gameOverImage.width) / 2;
-        int imgY = (screenHeight - gameOverImage.height) / 2;
-        DrawTexture(gameOverImage, imgX, imgY, WHITE);
+        int imgX, imgY;
+        if (deathType == 2) { // 怪物死亡：显示game over2.png
+            imgX = (screenWidth - gameOverEnemyImage.width) / 2;
+            imgY = (screenHeight - gameOverEnemyImage.height) / 2;
+            DrawTexture(gameOverEnemyImage, imgX, imgY, WHITE);
+        } else { // 熔岩死亡/混合死亡：显示game over.png
+            imgX = (screenWidth - gameOverImage.width) / 2;
+            imgY = (screenHeight - gameOverImage.height) / 2;
+            DrawTexture(gameOverImage, imgX, imgY, WHITE);
+        }
     }
 }
 
@@ -93,6 +100,9 @@ bool GameManager::Init() {
     if (!LoadGameOverImage()) {
         return false;
     } // 加载失败图片
+    if (!LoadGameOverEnemyImage()) {
+        return false;
+    } // 加载新失败图片
     LoadMazeTextures(maze, imagePath);
     // 初始化敌人
     if(enemy == nullptr) {
@@ -225,6 +235,8 @@ void GameManager::Run() {
                 isGameOver = false;
                 lavaCount = 0;
                 enemyCollisionCount = 0;
+                deathType = 0;
+                lastDeathTrigger = 0;
                 // 重置玩家位置（需确保 Player 类有 Reset 方法）
                 player.Reset(maze);
                 if(enemy) enemy->Reset(maze.endPos, maze.tileSize, maze);
@@ -246,19 +258,23 @@ void GameManager::Run() {
             bool currOnLava = (maze.data[tileY][tileX] == 3);
             if (currOnLava && !isOnLava) {
                 lavaCount++;
+                lastDeathTrigger = 1;
                 TraceLog(LOG_INFO, TextFormat("踩中熔岩！计数：%d", lavaCount));
                 if (lavaCount >=1 && enemyCollisionCount >=1) {
                     isGameOver = true;
+                    deathType = lastDeathTrigger; // 怪物死亡
                 }
             }
             if(lavaCount >= 2) {
                 isGameOver = true;
+                deathType = 1; // 熔岩死亡
                 TraceLog(LOG_INFO, "熔岩计数达到2，游戏结束！");
             }
             isOnLava = currOnLava;
             // 检测敌人碰撞
             if (CheckPlayerEnemyCollision()&& enemyCollisionTimer >= enemyCollisionCooldown) {
                 enemyCollisionCount++;
+                lastDeathTrigger = 2;
                 enemyCollisionTimer = 0.0f;
                 TraceLog(LOG_INFO, TextFormat("碰到敌人！计数：%d", enemyCollisionCount));
                 if (enemyCollisionCount == 1) {
@@ -268,6 +284,12 @@ void GameManager::Run() {
                 }
                 if (enemyCollisionCount >= 2 || (lavaCount >= 1 && enemyCollisionCount >= 1)) {
                     isGameOver = true;
+                    // 新增：判断死亡原因
+                    if (enemyCollisionCount >= 2) {
+                        deathType = 2; // 纯怪物死亡
+                    } else if (lavaCount >=1 && enemyCollisionCount >=1) {
+                        deathType = lastDeathTrigger; // 混合死亡：按最后触发事件判定
+                    }
                     TraceLog(LOG_INFO, "敌人碰撞/熔岩+碰撞计数达到2，游戏结束！");
                 }
             }
@@ -301,6 +323,17 @@ bool GameManager::LoadGameOverImage() {
         return false;
     }
     gameOverImage = LoadTextureFromImage(img);
+    UnloadImage(img);
+    return true;
+}
+
+bool GameManager::LoadGameOverEnemyImage() {
+    Image img = LoadImage((imagePath + "game over2.png").c_str());
+    if (img.data == nullptr) {
+        TraceLog(LOG_ERROR, "Failed to load game over2 image!");
+        return false;
+    }
+    gameOverEnemyImage = LoadTextureFromImage(img);
     UnloadImage(img);
     return true;
 }
@@ -362,6 +395,7 @@ void GameManager::Cleanup() {
     UnloadTexture(startImage);
     UnloadTexture(victoryImage);
     UnloadTexture(gameOverImage);
+    UnloadTexture(gameOverEnemyImage);
     UnloadMazeTextures(maze);
     player.Unload();
     CloseWindow();
