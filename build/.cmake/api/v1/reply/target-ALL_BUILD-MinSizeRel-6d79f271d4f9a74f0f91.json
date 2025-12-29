@@ -17,11 +17,7 @@
 	"dependencies" : 
 	[
 		{
-<<<<<<<< Updated upstream:build/.cmake/api/v1/reply/target-ALL_BUILD-MinSizeRel-62261536714d7e8aa845.json
-			"id" : "game::@6890427a1f51a3e7e1df"
-========
 			"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df"
->>>>>>>> Stashed changes:build/.cmake/api/v1/reply/target-ALL_BUILD-MinSizeRel-6d79f271d4f9a74f0f91.json
 		},
 		{
 			"id" : "raylib::@4dc3a4644cf4ded08c01"
@@ -30,11 +26,7 @@
 			"id" : "glfw::@9de86fbe87260ae8e66c"
 		},
 		{
-<<<<<<<< Updated upstream:build/.cmake/api/v1/reply/target-ALL_BUILD-MinSizeRel-62261536714d7e8aa845.json
-			"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df"
-========
 			"id" : "game::@6890427a1f51a3e7e1df"
->>>>>>>> Stashed changes:build/.cmake/api/v1/reply/target-ALL_BUILD-MinSizeRel-6d79f271d4f9a74f0f91.json
 		}
 	],
 	"folder" : 

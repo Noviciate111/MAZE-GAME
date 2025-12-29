@@ -30,7 +30,7 @@ bool Player::IsMoveValid(int newTileX, int newTileY, const Maze& maze) {
     return maze.data[newTileY][newTileX] != 1;
 }
 
-// 新增：根据地形类型返回移动时长（草地3倍速慢，熔岩/地板正常）
+// 根据地形类型返回移动时长（草地3倍速慢，熔岩/地板正常）
 float Player::GetMoveDurationByTile(const Maze& maze, int tileX, int tileY) {
     int tileType = maze.data[tileY][tileX];
     if (tileType == 2) { // 草地
@@ -39,7 +39,7 @@ float Player::GetMoveDurationByTile(const Maze& maze, int tileX, int tileY) {
     return baseMoveDuration; // 其他地形正常速度
 }
 
-// 新增：获取当前格子坐标
+// 获取当前格子坐标
 pair<int, int> Player::GetCurrentTile() const {
     int tileX = (int)(position.x - (tileSize - frameWidth) / 2) / tileSize;
     int tileY = (int)(position.y - (tileSize - frameHeight) / 2) / tileSize;
@@ -57,7 +57,7 @@ bool Player::Init(const Maze& maze, const string& imagePath) {
     texPlayer = LoadTextureFromImage(img);
     UnloadImage(img);
 
-    // 新增：检测纹理加载是否成功
+    // 检测纹理加载是否成功
     if (texPlayer.id == 0) {
         TraceLog(LOG_ERROR, "Failed to create player texture from image!");
         return false;
@@ -74,7 +74,7 @@ bool Player::Init(const Maze& maze, const string& imagePath) {
     moveStartPos = position;
     moveTargetPos = position;
 
-    // 基于格子大小初始化基础移动时长（可选：按像素速度计算）
+    // 基于格子大小初始化基础移动时长
     baseMoveDuration = (float)tileSize / 150.0f; // 150px/s 速度
     currMoveDuration = baseMoveDuration;
 
@@ -88,7 +88,7 @@ bool Player::Init(const Maze& maze, const string& imagePath) {
 void Player::Move(const Maze& maze) {
     // 移动中时，执行插值计算
     if (isMoving) {
-        // 优化：用clamp限制进度范围，避免数值溢出
+        // 用clamp限制进度范围，避免数值溢出
         moveProgress = clamp(moveProgress + GetFrameTime() / currMoveDuration, 0.0f, 1.0f);
 
         // 线性插值计算当前位置

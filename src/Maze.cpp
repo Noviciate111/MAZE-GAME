@@ -70,7 +70,7 @@ void FindStartEnd(Maze& maze) {
     }
 }
 
-// DFS路径查找（递归实现）
+// DFS路径查找
 bool DFSHelper(Maze& maze, int x, int y, vector<vector<bool>>& visited, vector<pair<int, int>>& path) {
     // 越界、墙、已访问则返回false
     if (x < 0 || x >= maze.cols || y < 0 || y >= maze.rows || maze.data[y][x] == 1 || visited[y][x]) {
@@ -101,9 +101,9 @@ void DFSFindPath(Maze& maze) {
     DFSHelper(maze, maze.startPos.first, maze.startPos.second, visited, maze.dfsPath);
 }
 
-// 修正后的BFSFindPath
+// BFSFindPath
 void BFSFindPath(Maze& maze) {
-    queue<pair<int, int>> q; // 改用普通队列（BFS标准实现）
+    queue<pair<int, int>> q; // 用普通队列（BFS标准实现）
     vector<vector<bool>> visited(maze.rows, vector<bool>(maze.cols, false));
     vector<vector<pair<int, int>>> parent(maze.rows, vector<pair<int, int>>(maze.cols, {-1, -1}));
 
@@ -125,7 +125,7 @@ void BFSFindPath(Maze& maze) {
         for (auto& dir : dirs) {
             int nx = x + dir[0];
             int ny = y + dir[1];
-            // 优化：增加边界+非墙+未访问三重检测
+            // 增加边界+非墙+未访问三重检测
             if (nx < 0 || nx >= maze.cols || ny < 0 || ny >= maze.rows || maze.data[ny][nx] == 1 || visited[ny][nx]) {
                 continue;
             }
@@ -176,7 +176,7 @@ void DijkstraFindPath(Maze& maze) {
                 continue;
             }
 
-            // 严格按成本定义计算
+            // 按成本定义计算
             int cost = 1; // 地板
             if (maze.data[ny][nx] == 2) cost = 3; // 草地
             else if (maze.data[ny][nx] == 3) cost = 1000; // 岩浆（等效不可走）
@@ -189,7 +189,7 @@ void DijkstraFindPath(Maze& maze) {
         }
     }
 
-    // 回溯路径（不变）
+    // 回溯路径
     maze.dijkstraPath.clear();
     for (pair<int, int> p = maze.endPos; p != make_pair(-1, -1); p = parent[p.second][p.first]) {
         maze.dijkstraPath.push_back(p);
@@ -202,10 +202,8 @@ void LavaDijkstraFindPath(Maze& maze) {
     int rows = maze.rows;
     int cols = maze.cols;
 
-    // dist[y][x][usedLava]：usedLava=0（未踩岩浆）、1（已踩1次）
     const int INF = INT_MAX;
     vector<vector<vector<int>>> dist(rows, vector<vector<int>>(cols, vector<int>(2, INF)));
-    // parent[y][x][usedLava]：(px, py, pUsedLava)
     vector<vector<vector<tuple<int, int, int>>>> parent(rows, vector<vector<tuple<int, int, int>>>(cols, vector<tuple<int, int, int>>(2, {-1, -1, -1})));
 
     int startX = maze.startPos.first;
@@ -267,7 +265,7 @@ void LavaDijkstraFindPath(Maze& maze) {
         return;
     }
 
-    // 回溯生成路径（不变）
+    // 回溯生成路径
     int currX = endX;
     int currY = endY;
     int currUsed = bestUsedLava;
@@ -340,7 +338,7 @@ void DrawPathInfo(PathAlgorithm currentAlgo) {
     int h = 0;
     int NewfontSize = 16;
 
-    // 新增：显示按键提示
+    // 显示按键提示
     DrawText("Shift+1: Hide Path", w, h + 15, NewfontSize, WHITE);
     DrawText("Shift+2: DFS", w, h + 35, NewfontSize, WHITE);
     DrawText("Shift+3: BFS", w, h + 55, NewfontSize, WHITE);
@@ -384,7 +382,7 @@ void RecursiveBacktracker(Maze& maze, int x, int y, vector<vector<bool>>& visite
     for (auto& dir : dirs) {
         int ny = y + dir.first;
         int nx = x + dir.second;
-        // 关键修改：限制 ny/nx 在 1 ~ rows-2 / cols-2 之间
+        // 限制 ny/nx 在 1 ~ rows-2 / cols-2 之间
         if (ny >= 1 && ny <= maze.rows-2 && nx >= 1 && nx <= maze.cols-2 && !visited[ny][nx]) {
             // 打通中间墙壁
             int wallY = y + dir.first / 2;
@@ -424,7 +422,7 @@ void GenerateRandomMaze(Maze& maze, int rows, int cols, int tileSize) {
     maze.cols = cols;
     maze.tileSize = tileSize;
 
-    // 优化：复用全局随机数生成器（避免短时间重复初始化）
+    // 复用全局随机数生成器（避免短时间重复初始化）
     static mt19937 rng((unsigned int)time(nullptr));
     // 起点：内圈奇数坐标（1 ≤ x ≤ cols-2，1 ≤ y ≤ rows-2）
     uniform_int_distribution<int> oddDistX(0, (cols-3)/2);
@@ -485,7 +483,7 @@ void GenerateRandomMaze(Maze& maze, int rows, int cols, int tileSize) {
         lavaCandidates.push_back(pathTiles[i]);
     }
 
-    int maxRetry = 25; // 优化：提升命中概率
+    int maxRetry = 25; // 提升命中概率
     bool lavaValid = false; // 标记是否生成了合法的熔岩分布
     while (maxRetry-- > 0) {
         // 临时生成熔岩：先清空旧熔岩

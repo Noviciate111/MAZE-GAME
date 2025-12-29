@@ -6,7 +6,7 @@
 
 using namespace std;
 
-// 静态随机数生成器（避免重复创建）
+// 静态随机数生成器
 static mt19937 rng((unsigned int)time(nullptr));
 
 Enemy::Enemy(int tileSize, pair<int, int> endPos) {
@@ -16,7 +16,7 @@ Enemy::Enemy(int tileSize, pair<int, int> endPos) {
     this->moveTimer = 0.0f;
     this->moveSpeed = 0.0f;
 
-    // 动画初始化（与玩家一致）
+    // 动画初始化
     this->frameWidth = 0;
     this->frameHeight = 0;
     this->currFrame = 1;          // 初始静止帧
@@ -164,7 +164,7 @@ void Enemy::Draw() {
     DrawTextureRec(tex, frameRect, position, WHITE);
 }
 
-void Enemy::Reset(pair<int, int> newEndPos, int newTileSize) {
+void Enemy::Reset(pair<int, int> newEndPos, int newTileSize,  const Maze& maze) {
     this->homePos = newEndPos;
     this->tileSize = newTileSize;
 

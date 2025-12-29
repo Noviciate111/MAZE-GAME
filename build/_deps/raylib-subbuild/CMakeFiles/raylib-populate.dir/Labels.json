@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/Users/\u5ed6\u709c/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/raylib-populate"
+		},
+		{
+			"file" : "C:/Users/\u5ed6\u709c/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/758f4c2a5cb6cffc46b7b4899d086757/raylib-populate.rule"
+		},
+		{
+			"file" : "C:/Users/\u5ed6\u709c/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/b6e5463de9d4ed5229d610a947d17d89/raylib-populate-complete.rule"
+		},
+		{
+			"file" : "C:/Users/\u5ed6\u709c/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-build.rule"
+		},
+		{
+			"file" : "C:/Users/\u5ed6\u709c/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-configure.rule"
+		},
+		{
+			"file" : "C:/Users/\u5ed6\u709c/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-download.rule"
+		},
+		{
+			"file" : "C:/Users/\u5ed6\u709c/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-install.rule"
+		},
+		{
+			"file" : "C:/Users/\u5ed6\u709c/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-mkdir.rule"
+		},
+		{
+			"file" : "C:/Users/\u5ed6\u709c/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-patch.rule"
+		},
+		{
+			"file" : "C:/Users/\u5ed6\u709c/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-test.rule"
+		},
+		{
+			"file" : "C:/Users/\u5ed6\u709c/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"raylib-populate"
+		],
+		"name" : "raylib-populate"
+	}
+}

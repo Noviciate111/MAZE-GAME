@@ -14,9 +14,8 @@ GameManager::~GameManager() {
     if(enemy != nullptr) {
         enemy->Unload();
         delete enemy;
-        enemy = nullptr;// 优化：防止悬空指针
+        enemy = nullptr;// 防止悬空指针
     }
-    // Cleanup();
 }
 
 bool GameManager::LoadStartImage() {
@@ -56,11 +55,11 @@ void GameManager::DrawGameStatus() {
     // 绘制失败图片
     if (isGameOver) {
         int imgX, imgY;
-        if (deathType == 2) { // 怪物死亡：显示game over2.png
+        if (deathType == 2) { // 怪物死亡
             imgX = (screenWidth - gameOverEnemyImage.width) / 2;
             imgY = (screenHeight - gameOverEnemyImage.height) / 2;
             DrawTexture(gameOverEnemyImage, imgX, imgY, WHITE);
-        } else { // 熔岩死亡/混合死亡：显示game over.png
+        } else { // 熔岩死亡/混合死亡
             imgX = (screenWidth - gameOverImage.width) / 2;
             imgY = (screenHeight - gameOverImage.height) / 2;
             DrawTexture(gameOverImage, imgX, imgY, WHITE);
@@ -71,9 +70,7 @@ void GameManager::DrawGameStatus() {
 bool GameManager::Init() {
     if (useRandomMaze) {
         // 生成随机迷宫
-        // 在GameManager的Init/Run中调用GenerateRandomMaze时（优化）：
         GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, maze.tileSize);
-        // GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, 50);
         TraceLog(LOG_INFO, "Generated random maze: %dx%d", randomMazeRows, randomMazeCols);
     } else {
         // 加载迷宫数据
@@ -123,7 +120,7 @@ bool GameManager::Init() {
     return true;
 }
 
-// 优化：Shift+数字键精准切换路径算法
+// Shift+数字键切换路径算法
 void GameManager::SwitchPathAlgorithm() {
     // Shift+1 → 隐藏路径（NONE）
     if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
@@ -146,7 +143,7 @@ void GameManager::SwitchPathAlgorithm() {
             currentAlgo = PathAlgorithm::DIJKSTRA;
             TraceLog(LOG_INFO, "Switched to: Dijkstra Path");
         }
-        // 可选：Shift+5 → 熔岩Dijkstra路径
+        // Shift+5 → 熔岩Dijkstra路径
         else if (IsKeyPressed(KEY_FIVE)) {
             currentAlgo = PathAlgorithm::LAVA_DIJKSTRA;
             TraceLog(LOG_INFO, "Switched to: Lava Dijkstra Path");
@@ -167,17 +164,17 @@ void GameManager::Run() {
         enemyCollisionTimer += GetFrameTime();
         // 1. 检测 Ctrl+R：加载 maze0.txt 文件迷宫
         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_R)) {
-            // 步骤1：清理旧迷宫资源
+            // 清理旧迷宫资源
             UnloadMazeTextures(maze);
             // 清空所有路径
             maze.dfsPath.clear();
             maze.bfsPath.clear();
             maze.dijkstraPath.clear();
             maze.lavaShortestPath.clear();
-            // 步骤2：加载 maze0.txt 文件
+            // 加载 maze0.txt 文件
             if (LoadMazeFromFile(maze, mazePath)) {
                 TraceLog(LOG_INFO, "Loaded maze from file: %s", mazePath.c_str());
-                // 更新窗口尺寸（适配新迷宫）
+                // 更新窗口尺寸
                 screenWidth = maze.cols * maze.tileSize;
                 screenHeight = maze.rows * maze.tileSize;
                 SetWindowSize(screenWidth, screenHeight);
@@ -216,7 +213,7 @@ void GameManager::Run() {
             enemyCollisionCount = 0;
             isRandomMode = true; // 切回随机模式
         }
-        // 2. 原有 R 键：仅在随机模式下生成新随机迷宫
+        // 2.  R 键：仅在随机模式下生成新随机迷宫
         if (isRandomMode && IsKeyPressed(KEY_R)) {
             GenerateRandomMaze(maze, randomMazeRows, randomMazeCols, 50);
             player.Reset(maze);
@@ -237,7 +234,7 @@ void GameManager::Run() {
                 enemyCollisionCount = 0;
                 deathType = 0;
                 lastDeathTrigger = 0;
-                // 重置玩家位置（需确保 Player 类有 Reset 方法）
+                // 重置玩家位置
                 player.Reset(maze);
                 if(enemy) enemy->Reset(maze.endPos, maze.tileSize, maze);
             } else {
@@ -284,7 +281,7 @@ void GameManager::Run() {
                 }
                 if (enemyCollisionCount >= 2 || (lavaCount >= 1 && enemyCollisionCount >= 1)) {
                     isGameOver = true;
-                    // 新增：判断死亡原因
+                    // 判断死亡原因
                     if (enemyCollisionCount >= 2) {
                         deathType = 2; // 纯怪物死亡
                     } else if (lavaCount >=1 && enemyCollisionCount >=1) {
@@ -308,7 +305,7 @@ void GameManager::Run() {
             DrawMaze(maze, currentAlgo);
             player.Draw();
             enemy->Draw();
-            // 调用绘制状态的方法（显示熔岩计数和胜利图片）
+            // 调用绘制状态的方法
             DrawGameStatus();
         }
 
@@ -339,7 +336,7 @@ bool GameManager::LoadGameOverEnemyImage() {
 }
 
 bool GameManager::CheckPlayerEnemyCollision() {
-    // 玩家碰撞盒（优化：增加居中偏移）
+    // 玩家碰撞盒
     Vector2 playerPos = player.GetPosition();
     int pOffsetX = (maze.tileSize - player.GetFrameWidth()) / 2;
     int pOffsetY = (maze.tileSize - player.GetFrameHeight()) / 2;
@@ -348,7 +345,7 @@ bool GameManager::CheckPlayerEnemyCollision() {
         (float)player.GetFrameWidth(), (float)player.GetFrameHeight()
     };
 
-    // 敌人碰撞盒（优化：增加居中偏移）
+    // 敌人碰撞盒
     int eOffsetX = (maze.tileSize - enemy->frameWidth) / 2;
     int eOffsetY = (maze.tileSize - enemy->frameHeight) / 2;
     Rectangle enemyRect = {
@@ -381,7 +378,7 @@ void GameManager::KnockbackPlayer(int playerTileX, int playerTileY, int enemyTil
         Vector2 newPos = { (float)(newTileX * maze.tileSize) + offsetX, (float)(newTileY * maze.tileSize) + offsetY };
         player.SetPosition(newPos);
     }
-    // 修正：检测1格弹开的条件（直接用playerTileX+dx，而非newTileX-dx）
+    // 检测1格弹开的条件
     else if (playerTileX + dx >= 0 && playerTileX + dx < maze.cols && playerTileY + dy >= 0 && playerTileY + dy < maze.rows && maze.data[playerTileY + dy][playerTileX + dx] != 1) {
         newTileX = playerTileX + dx;
         newTileY = playerTileY + dy;

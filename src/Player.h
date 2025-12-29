@@ -29,7 +29,7 @@ private:
     Direction dir;          // 当前移动方向
     float moveCooldown;     // 单次移动的冷却时间（秒）
     float moveTimer;        // 移动冷却计时器
-    // 新增平滑移动变量
+    // 平滑移动变量
     bool isMoving;          // 是否处于移动中
     float moveProgress;     // 移动进度 [0,1]
     float baseMoveDuration; // 基础单格移动时长
@@ -40,7 +40,7 @@ private:
     int GetSpriteRowByDir();
     // 检查移动是否合法（非墙）
     bool IsMoveValid(int newTileX, int newTileY, const Maze& maze);
-    // 新增：获取地形对应的移动时长
+    // 获取地形对应的移动时长
     float GetMoveDurationByTile(const Maze& maze, int tileX, int tileY);
 
 public:
@@ -63,6 +63,6 @@ public:
     // 卸载纹理
     void Unload();
     void Reset(const Maze& maze);
-    // 新增：获取当前格子坐标（对外接口，用于检测终点/熔岩）
+    // 获取当前格子坐标（对外接口，用于检测终点/熔岩）
     pair<int, int> GetCurrentTile() const;
 };

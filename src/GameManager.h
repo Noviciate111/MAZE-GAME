@@ -15,10 +15,10 @@ private:
     Texture2D victoryImage;
     Texture2D gameOverImage;
     Texture2D gameOverEnemyImage;
-    int deathType = 0; // 新增：死亡类型标记 0=未死 1=熔岩死亡 2=怪物死亡
-    int lastDeathTrigger = 0; // 新增：记录最后一次触发死亡的原因 1=熔岩 2=怪物
+    int deathType = 0; // 死亡类型标记 0=未死 1=熔岩死亡 2=怪物死亡
+    int lastDeathTrigger = 0; // 记录最后一次触发死亡的原因 1=熔岩 2=怪物
     bool isMazeScene = false;
-    PathAlgorithm currentAlgo = PathAlgorithm::NONE; // 修正：用PathAlgorithm枚举
+    PathAlgorithm currentAlgo = PathAlgorithm::NONE; // 用PathAlgorithm枚举
     const string imagePath;  // 图片资源路径
     const string mazePath;   // 迷宫数据路径
     int screenWidth = 0;
@@ -26,9 +26,9 @@ private:
     bool isVictory = false;
     bool isGameOver = false;
     int lavaCount = 0;
-    bool useRandomMaze; // 新增：是否使用随机迷宫
-    int randomMazeRows; // 随机迷宫行数（建议奇数）
-    int randomMazeCols; // 随机迷宫列数（建议奇数）
+    bool useRandomMaze; // 是否使用随机迷宫
+    int randomMazeRows; // 随机迷宫行数
+    int randomMazeCols; // 随机迷宫列数
 
     Enemy* enemy;                // 史莱姆敌人
     int enemyCollisionCount;     // 敌人碰撞计数（0/1/2）
@@ -59,7 +59,6 @@ public:
     GameManager(const string& imgPath = "../../resources/images/", 
                 const string& mzPath = "../../resources/data/maze0.txt",
                 bool randomMaze = false, int rows = 15, int cols = 15);  
-    // GameManager(const string& imgPath, const string& mzPath, bool randomMaze, int rows, int cols);
     ~GameManager();
     // 游戏初始化
     bool Init();

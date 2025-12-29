@@ -1,0 +1,14 @@
+# Target labels
+ raylib-populate
+# Source files and their labels
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/raylib-populate
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/758f4c2a5cb6cffc46b7b4899d086757/raylib-populate.rule
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/b6e5463de9d4ed5229d610a947d17d89/raylib-populate-complete.rule
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-build.rule
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-configure.rule
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-download.rule
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-install.rule
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-mkdir.rule
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-patch.rule
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-test.rule
+C:/Users/廖炜/Desktop/maze game/build/_deps/raylib-subbuild/CMakeFiles/c7c425f30d052c8f7d607dec3bf7be5f/raylib-populate-update.rule
